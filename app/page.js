@@ -1,4 +1,5 @@
 import { Recorder } from "./Recorder";
+import { SpeakToText } from "./SpeakToText";
 
 async function getSttJwt() {
   const res = await fetch("https://openapi.vito.ai/v1/authenticate", {
@@ -18,11 +19,11 @@ async function getSttJwt() {
 
 export default async function Home() {
   const sttJwt = await getSttJwt();
-  console.log(sttJwt);
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <Recorder sttJwt={sttJwt} />
+      <Recorder />
+      <SpeakToText sttJwt={sttJwt} />
     </main>
   );
 }

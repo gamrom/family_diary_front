@@ -2,14 +2,14 @@
 
 // components/Recorder.js
 import React, { useState, useRef } from "react";
-import axios from "axios";
 
-export const Recorder = ({ sttJwt }) => {
+export const Recorder = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [audioURL, setAudioURL] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const mediaRecorder = useRef(null);
   const audioChunks = useRef([]);
+  const audioBlob = useRef(null); // Add a ref to store the audio blob
 
   const startRecording = async () => {
     try {
@@ -19,8 +19,10 @@ export const Recorder = ({ sttJwt }) => {
         audioChunks.current.push(event.data);
       };
       mediaRecorder.current.onstop = () => {
-        const audioBlob = new Blob(audioChunks.current, { type: "audio/wav" });
-        const audioUrl = URL.createObjectURL(audioBlob);
+        audioBlob.current = new Blob(audioChunks.current, {
+          type: "audio/wav",
+        });
+        const audioUrl = URL.createObjectURL(audioBlob.current);
         setAudioURL(audioUrl);
         audioChunks.current = [];
       };
@@ -28,8 +30,7 @@ export const Recorder = ({ sttJwt }) => {
       setIsRecording(true);
       setErrorMessage("");
     } catch (error) {
-      console.error("Error accessing media devices:", error);
-      setErrorMessage("Error accessing media devices: " + error.message);
+      console.log(error);
     }
   };
 
@@ -37,20 +38,6 @@ export const Recorder = ({ sttJwt }) => {
     if (mediaRecorder.current) {
       mediaRecorder.current.stop();
       setIsRecording(false);
-
-      axios("https://openapi.vito.ai/v1/transcribe", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${sttJwt}`,
-          Accept: "application/json",
-          "Content-Type": "multipart/form-data",
-        },
-        data: {
-          file: audioChunks.current,
-        },
-      }).then((res) => {
-        console.log(res);
-      });
     }
   };
 
