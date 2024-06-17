@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import axios from "axios";
 
 export const SpeakToText = ({ sttJwt }) => {
   const [audioData, setAudioData] = useState(null);
@@ -19,20 +20,17 @@ export const SpeakToText = ({ sttJwt }) => {
     formData.append("config", JSON.stringify({}));
 
     try {
-      const res = await fetch("https://openapi.vito.ai/v1/transcribe", {
-        method: "POST",
-        headers: {
-          Authorization: `bearer ${sttJwt}`,
+      const res = await axios.post(
+        "https://openapi.vito.ai/v1/transcribe",
+        formData,
+        {
+          headers: {
+            Authorization: `bearer ${sttJwt}`,
+            "Content-Type": "multipart/form-data",
+          },
         },
-        body: formData,
-      });
-
-      if (!res.ok) {
-        throw new Error("Network response was not ok");
-      }
-
-      const data = await res.json();
-      setResponse(data);
+      );
+      setResponse(res.data);
       setError(null); // Clear any previous errors
     } catch (error) {
       console.error(error);
