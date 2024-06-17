@@ -1,4 +1,4 @@
-import "use client";
+"use client";
 import React, { useState, useRef } from "react";
 
 export const Content = () => {
