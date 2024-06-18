@@ -3,6 +3,8 @@
 // components/Recorder.js
 import React, { useState, useRef } from "react";
 
+import axios from "axios";
+
 export const Recorder = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [audioURL, setAudioURL] = useState("");
@@ -10,6 +12,8 @@ export const Recorder = () => {
   const mediaRecorder = useRef(null);
   const audioChunks = useRef([]);
   const audioBlob = useRef(null); // Add a ref to store the audio blob
+
+  const [transcript, setTranscript] = useState("");
 
   const startRecording = async () => {
     try {
@@ -41,6 +45,19 @@ export const Recorder = () => {
     }
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await axios.post("/api/transcripts", {
+        audio_url: audioURL,
+      });
+      setTranscript(response.data.text);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
   return (
     <div>
       <button onClick={isRecording ? stopRecording : startRecording}>
@@ -52,6 +69,13 @@ export const Recorder = () => {
           <a href={audioURL} download="recording.wav">
             Download Recording
           </a>
+
+          <form onSubmit={handleSubmit}>
+            <button type="submit">Transcribe</button>
+
+            {transcript && <div>{JSON.stringify(transcript)}</div>}
+          </form>
+          {JSON.stringify(audioURL)}
         </div>
       )}
       {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}

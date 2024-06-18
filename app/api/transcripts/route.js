@@ -11,7 +11,8 @@ export async function POST(request) {
     // const audioUrl = "https://t1.daumcdn.net/cfile/tistory/155667134C5A464171";
     // const audioUrl = "https://t1.daumcdn.net/cfile/tistory/195F9B134C5A462F3D";
     // const audioUrl = "https://clova.ai//speech/media/sample_ytn.mp3";
-    const audioUrl = "https://clova.ai/speech/media/media_sample.mp3";
+    // const audioUrl = "https://clova.ai/speech/media/media_sample.mp3";
+    const audioUrl = request.body.audio_url;
 
     const config = {
       audio_url: audioUrl,
