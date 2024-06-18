@@ -1,17 +1,19 @@
 "use client";
 import React, { useState } from "react";
-import axios from "axios";
 
-export const SpeakToText = ({ sttJwt }) => {
+export const SpeakToText = () => {
   const [audioData, setAudioData] = useState(null);
   const [response, setResponse] = useState(null);
   const [error, setError] = useState(null);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    setAudioData(file);
+  };
 
+  const handleSubmit = async (event) => {
     if (!audioData) {
-      setError("Please select an audio file.");
+      alert("Please upload a file.");
       return;
     }
 
@@ -20,39 +22,34 @@ export const SpeakToText = ({ sttJwt }) => {
     formData.append("config", JSON.stringify({}));
 
     try {
-      const res = await axios.post(
-        "https://openapi.vito.ai/v1/transcribe",
-        formData,
-        {
-          headers: {
-            Authorization: `bearer ${sttJwt}`,
-            "Content-Type": "multipart/form-data",
-          },
-        },
-      );
-      setResponse(res.data);
-      setError(null); // Clear any previous errors
+      const response = await fetch("/api/transcribe", {
+        method: "POST",
+        body: formData,
+      });
+      if (response) {
+        const data = await response.json();
+        console.log("Transcription result:", data);
+      }
     } catch (error) {
-      console.error(error);
-      setError("An error occurred while uploading the file.");
+      console.error("Error:", error);
     }
   };
 
   return (
     <div>
-      <form onSubmit={handleSubmit}>
+      <div>
         <label htmlFor="audio">Audio File:</label>
         <input
-          onChange={(e) => {
-            setAudioData(e.target.files[0]);
-          }}
+          onChange={handleFileChange}
           type="file"
           id="audio"
           name="audio"
           accept="audio/*"
         />
-        <button type="submit">Submit</button>
-      </form>
+        <button type="button" onClick={handleSubmit}>
+          Submit
+        </button>
+      </div>
       {response && (
         <div>
           <h3>Transcription Result:</h3>
@@ -63,5 +60,3 @@ export const SpeakToText = ({ sttJwt }) => {
     </div>
   );
 };
-
-export default SpeakToText;
