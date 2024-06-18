@@ -1,0 +1,114 @@
+.circle_default {
+  width: 82px;
+  border-radius: 9999px;
+  animation-duration: 0.5s;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+.circle_recording {
+  background: linear-gradient(
+    284.6deg,
+    #ff2f6d -1.58%,
+    #fa402e 23.85%,
+    #fe5c21 40.91%,
+    #f65777 69.89%,
+    #fb91c0 97.96%,
+    #fa9bdf 106.9%,
+    #ff79e1 118.95%
+  );
+}
+
+$height1: 80px;
+$height2: 100px;
+$height3: 110px;
+$height4: 120px;
+$height5: 130px;
+
+@keyframes circle_height_animation1 {
+  0% {
+    height: $height1;
+  }
+  23% {
+    height: $height2;
+  }
+  46% {
+    height: $height3;
+  }
+  69% {
+    height: $height2;
+  }
+  100% {
+    height: $height1;
+  }
+}
+
+@keyframes circle_height_animation2 {
+  0% {
+    height: $height2;
+  }
+  23% {
+    height: $height3;
+  }
+  46% {
+    height: $height2;
+  }
+  69% {
+    height: $height1;
+  }
+  100% {
+    height: $height2;
+  }
+}
+
+@keyframes circle_height_animation3 {
+  0% {
+    height: $height3;
+  }
+  23% {
+    height: $height4;
+  }
+  46% {
+    height: $height3;
+  }
+  69% {
+    height: $height2;
+  }
+  100% {
+    height: $height3;
+  }
+}
+
+@keyframes circle_height_animation4 {
+  0% {
+    height: $height4;
+  }
+  23% {
+    height: $height3;
+  }
+  46% {
+    height: $height2;
+  }
+  69% {
+    height: $height3;
+  }
+  100% {
+    height: $height4;
+  }
+}
+
+.circle_animation1 {
+  animation-name: circle_height_animation1;
+}
+
+.circle_animation2 {
+  animation-name: circle_height_animation2;
+}
+
+.circle_animation3 {
+  animation-name: circle_height_animation3;
+}
+
+.circle_animation4 {
+  animation-name: circle_height_animation4;
+}
