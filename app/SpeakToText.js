@@ -1,6 +1,20 @@
 "use client";
 import React, { useState } from "react";
 
+import { AssemblyAI } from "assemblyai";
+
+const client = new AssemblyAI({
+  apiKey: process.env.ASSEMBLY_API_KEY,
+});
+
+const audioUrl =
+  "https://storage.googleapis.com/aai-web-samples/5_common_sports_injuries.mp3";
+
+const config = {
+  audio_url: audioUrl,
+  language_code: "es",
+};
+
 export const SpeakToText = () => {
   const [audioData, setAudioData] = useState(null);
   const [response, setResponse] = useState(null);
@@ -12,27 +26,13 @@ export const SpeakToText = () => {
   };
 
   const handleSubmit = async (event) => {
-    if (!audioData) {
-      alert("Please upload a file.");
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("file", audioData);
-    formData.append("config", JSON.stringify({}));
-
-    try {
-      const response = await fetch("/api/transcribe", {
-        method: "POST",
-        body: formData,
-      });
-      if (response) {
-        const data = await response.json();
-        console.log("Transcription result:", data);
-      }
-    } catch (error) {
-      console.error("Error:", error);
-    }
+    setAudioData(
+      new Blob([audioData], {
+        type: "audio/wav",
+      }),
+    );
+    const transcript = await client.transcripts.transcribe(config);
+    console.log(transcript);
   };
 
   return (

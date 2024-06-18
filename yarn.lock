@@ -469,6 +469,13 @@ arraybuffer.prototype.slice@^1.0.3:
     is-array-buffer "^3.0.4"
     is-shared-array-buffer "^1.0.2"
 
+assemblyai@^4.5.0:
+  version "4.5.0"
+  resolved "https://registry.yarnpkg.com/assemblyai/-/assemblyai-4.5.0.tgz#84edd2fb34feaf67d4b206c7bcd98f8c4d134e82"
+  integrity sha512-5GnxD5NAvw+bwUyNDUh3UlqND4XnHiLzog4ObCgGrTcZMSBPRGJ3aqTWKemoeVPu7H7lJaAdQvLtaqMkNKiy2Q==
+  dependencies:
+    ws "^8.17.0"
+
 ast-types-flow@^0.0.8:
   version "0.0.8"
   resolved "https://registry.yarnpkg.com/ast-types-flow/-/ast-types-flow-0.0.8.tgz#0a85e1c92695769ac13a428bb653e7538bea27d6"
@@ -2763,6 +2770,11 @@ wrappy@1:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/wrappy/-/wrappy-1.0.2.tgz#b5243d8f3ec1aa35f1364605bc0d1036e30ab69f"
   integrity sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==
+
+ws@^8.17.0:
+  version "8.17.1"
+  resolved "https://registry.yarnpkg.com/ws/-/ws-8.17.1.tgz#9293da530bb548febc95371d90f9c878727d919b"
+  integrity sha512-6XQFvXTkbfUOZOKKILFG1PDK2NDQs4azKQl26T0YS5CxqWLgXajbPZ+h4gZekJyRqFU8pvnbAbbs/3TgRPy+GQ==
 
 yaml@^2.3.4:
   version "2.4.5"
