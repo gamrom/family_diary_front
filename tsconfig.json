@@ -31,7 +31,8 @@
     "app/Recorder.js",
     "app/api/transcripts/route.js",
     "app/recording/new/Content.tsxx",
-    "app/recording/new/Content.js"
+    "app/recording/new/Content.js",
+    "app/mainpage/Content.js"
   ],
   "exclude": ["node_modules"]
 }
