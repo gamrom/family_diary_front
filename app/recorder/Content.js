@@ -52,8 +52,8 @@ export const Content = () => {
   };
 
   return (
-    <div className="bg-gray-200 p-4 rounded-lg shadow-md w-64 relative">
-      <div className="bg-gray-300 rounded-md p-2 mb-2">
+    <div className="relative w-64 p-4 bg-gray-200 rounded-lg shadow-md">
+      <div className="p-2 mb-2 bg-gray-300 rounded-md">
         <span className="text-gray-700">{recordingTime}</span>
       </div>
       <div className="flex items-center justify-center">
@@ -62,7 +62,7 @@ export const Content = () => {
           className={`w-12 h-12 rounded-full ${isRecording ? "bg-red-600" : "bg-gray-400"}`}
         ></button>
       </div>
-      <div className="flex justify-between items-center mt-2">
+      <div className="flex items-center justify-between mt-2">
         <button onClick={stopRecording} className="text-gray-700">
           취소
         </button>
@@ -74,7 +74,7 @@ export const Content = () => {
           </a>
         )}
       </div>
-      <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-3 h-3 bg-white rotate-45"></div>
+      <div className="absolute bottom-0 w-3 h-3 transform rotate-45 -translate-x-1/2 bg-white left-1/2"></div>
     </div>
   );
 };

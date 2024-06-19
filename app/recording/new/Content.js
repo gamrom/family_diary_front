@@ -10,8 +10,13 @@ import { useState, useEffect, useRef } from "react";
 
 export const Content = () => {
   const [recording, setRecording] = useState("ready"); // ready, recording, finished
-  const [audio, setAudio] = useState<File | null>(null);
-  const audioRef = useRef<HTMLInputElement>(null);
+  const [audio, setAudio] = useState(null);
+  const audioRef = useRef(null);
+  const [recordingTime, setRecordingTime] = useState("00:00");
+  const intervalRef = useRef(null);
+  const audioChunks = useRef([]);
+  const mediaRecorder = useRef(null);
+  const streamRef = useRef(null);
 
   const handleSubmit = () => {
     const formData = new FormData();
@@ -23,19 +28,89 @@ export const Content = () => {
     // console.log(transcript);
   };
 
-  const startRecording = () => {
-    setRecording("recording");
-  };
-
   const stopRecording = () => {
     setRecording("finished");
   };
 
   const reRecording = () => {
+    setRecording("ready");
+    setRecordingTime("00:00");
+    setAudio(null);
+  };
+
+  const startRecording = () => {
     setRecording("recording");
   };
 
-  const replayRecording = () => {};
+  const replayRecording = () => {
+    const audioElement = new Audio(URL.createObjectURL(audio));
+    audioElement.play();
+  };
+
+  console.log(audio);
+
+  useEffect(() => {
+    const handleRecording = async () => {
+      if (recording === "recording") {
+        let seconds = 0;
+        intervalRef.current = setInterval(() => {
+          seconds += 1;
+          setRecordingTime(
+            new Date(seconds * 1000).toISOString().substr(14, 5),
+          );
+        }, 1000);
+
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({
+            audio: true,
+          });
+          streamRef.current = stream;
+          mediaRecorder.current = new MediaRecorder(stream);
+          audioChunks.current = [];
+
+          mediaRecorder.current.ondataavailable = (event) => {
+            audioChunks.current.push(event.data);
+          };
+
+          mediaRecorder.current.onstop = () => {
+            const audioBlob = new Blob(audioChunks.current, {
+              type: "audio/*",
+            });
+            setAudio(audioBlob);
+          };
+
+          mediaRecorder.current.start();
+        } catch (error) {
+          console.error("Error accessing media devices:", error);
+        }
+      } else if (recording === "finished" || recording === "ready") {
+        if (
+          mediaRecorder.current &&
+          mediaRecorder.current.state !== "inactive"
+        ) {
+          mediaRecorder.current.stop();
+        }
+        if (streamRef.current) {
+          streamRef.current.getTracks().forEach((track) => track.stop());
+          streamRef.current = null;
+        }
+        clearInterval(intervalRef.current);
+      }
+    };
+
+    handleRecording();
+
+    return () => {
+      if (mediaRecorder.current && mediaRecorder.current.state !== "inactive") {
+        mediaRecorder.current.stop();
+      }
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((track) => track.stop());
+        streamRef.current = null;
+      }
+      clearInterval(intervalRef.current);
+    };
+  }, [recording]);
 
   return (
     <div className="flex flex-col justify-between min-h-screen">
@@ -69,28 +144,28 @@ export const Content = () => {
           </div>
 
           <div className="text-[#89898B] font-[500] font-[Kodchasan] mt-[30px]">
-            {}
+            {recordingTime}
           </div>
         </div>
       </ScreenCenterLayout>
 
       <BottomFix>
         {recording === "ready" && (
-          <button type="button" onClick={startRecording}>
+          <button type="button" onClick={() => startRecording()}>
             <Image src="/circle.svg" alt="준비" width={81} height={81} />
           </button>
         )}
         {recording === "recording" && (
-          <button type="button" onClick={stopRecording}>
+          <button type="button" onClick={() => stopRecording()}>
             <Image src="/stop.svg" alt="일시정지" width={81} height={81} />
           </button>
         )}
         {recording === "finished" && (
           <>
-            <button type="button" onClick={reRecording}>
+            <button type="button" onClick={() => reRecording()}>
               <Image src="/repeat.svg" alt="다시녹음" width={81} height={81} />
             </button>
-            <button type="button" onClick={replayRecording}>
+            <button type="button" onClick={() => replayRecording()}>
               <Image
                 src="/reRecord.svg"
                 alt="다시듣기"
@@ -98,7 +173,7 @@ export const Content = () => {
                 height={81}
               />
             </button>
-            <button type="button" onClick={handleSubmit}>
+            <button type="button" onClick={() => handleSubmit()}>
               <Image src="/upload.svg" alt="업로드" width={81} height={81} />
             </button>
           </>

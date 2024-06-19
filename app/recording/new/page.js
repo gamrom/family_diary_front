@@ -1,4 +1,4 @@
-import { Content } from "./Content";
+import { Content } from "./content";
 
 export default function RecodePage() {
   return <Content />;
