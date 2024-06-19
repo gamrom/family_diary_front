@@ -69,7 +69,6 @@ export const Content = () => {
       </MediaController>
 
       <div className="show-bg"></div>
-      <Loading />
     </div>
   );
 };

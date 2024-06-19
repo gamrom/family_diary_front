@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useState } from "react";
 
 export const Loading = ({ isLoading }: { isLoading: boolean }) => {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(isLoading);
 
   return loading ? (
     <div className="loading-overlay">
