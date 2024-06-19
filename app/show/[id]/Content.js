@@ -9,6 +9,14 @@ import "react-calendar/dist/Calendar.css";
 import "./style.css";
 import { Loading } from "../../_components/Loading";
 import { ProgressComp } from "./ProgressComp";
+import {
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  useDisclosure,
+} from "@nextui-org/modal";
 
 import {
   MediaController,
@@ -16,8 +24,10 @@ import {
   MediaTimeRange,
   MediaTimeDisplay,
 } from "media-chrome/react";
+import { LoadingTransform } from "./LoadingTransform";
 
 export const Content = () => {
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [progress, setProgress] = useState(0);
   console.log(progress);
   // when play, calculate progress -> current time / total duration * 100
@@ -32,6 +42,11 @@ export const Content = () => {
   audioRef.current?.addEventListener("play", () => {
     setProgress(0);
   });
+
+  const [isLoading, setIsLoading] = useState(false);
+  const onSubmit = () => {
+    setIsLoading(true);
+  };
 
   return (
     <div className="flex flex-col items-center">
@@ -87,6 +102,7 @@ export const Content = () => {
           </MediaPlayButton>
           <button
             type="button"
+            onClick={onOpen}
             className="!bg-transparent  w-[81px] h-[81px] circle-btn-shadow-show rounded-full bg-white flex items-center justify-center"
           >
             <Image src="/print.svg" width={32} height={28} alt="재생"></Image>
@@ -95,6 +111,53 @@ export const Content = () => {
       </MediaController>
 
       <div className="show-bg"></div>
+
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+        <ModalContent className="max-w-[328px] h-[60vh] p-[30px]">
+          {(onClose) => (
+            <>
+              {isLoading ? (
+                <ModalBody className="flex items-center p-0">
+                  <LoadingTransform onClose={onClose} />
+                </ModalBody>
+              ) : (
+                <ModalBody className="flex items-center p-0">
+                  <Image
+                    src="/circle_char.svg"
+                    className="mt-auto circle-btn-shadow rounded-full"
+                    width={89}
+                    height={89}
+                    alt="메인캐릭터"
+                  />
+
+                  <div className="text-center font-[600] text-lg font-[Kodchasan] px-[34px] mt-[37px]">
+                    수현님 180일간 아이와의 추억이 가득 찼네요.
+                    <br /> <br />
+                    지금 바로 추억을 육아일기 책으로 만나보시겠어요?
+                  </div>
+
+                  <div className="flex space-x-[19px] w-full mt-auto">
+                    <button
+                      type="button"
+                      onClick={onClose}
+                      className="bg-[#F5F5F5] text-[17px] font-[600] text-black w-full rounded-[25px] pt-[16px] pb-[15px] flex items-center justify-center"
+                    >
+                      취소
+                    </button>
+                    <button
+                      type="button"
+                      onClick={onSubmit}
+                      className="bg-[#FF4D49] text-[17px] font-[600] text-white w-full rounded-[25px] pt-[16px] pb-[15px] flex items-center justify-center"
+                    >
+                      확인
+                    </button>
+                  </div>
+                </ModalBody>
+              )}
+            </>
+          )}
+        </ModalContent>
+      </Modal>
     </div>
   );
 };

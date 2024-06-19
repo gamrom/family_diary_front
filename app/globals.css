@@ -70,11 +70,19 @@
   background-size: cover;
   width: 81px;
   height: 81px;
-  animation: spin 1s linear infinite; /* spinning animation */
   filter: drop-shadow(0px 1px 12px white);
+  animation: spin 1s linear infinite; /* spinning animation */
 }
 
-@keyframes spin {
+.loading-spinner-size_not_change {
+  animation: spin 1s linear infinite; /* spinning animation */
+}
+
+.loading-spinner-size_change {
+  animation: spin_size_change 1s linear infinite; /* spinning animation */
+}
+
+@keyframes spin_size_change {
   0% {
     width: 81px;
     height: 81px;
@@ -91,8 +99,23 @@
   }
 }
 
+@keyframes spin {
+  0% {
+    width: 81px;
+    height: 81px;
+    transform: rotate(0deg);
+  }
+
+  100% {
+    width: 81px;
+    height: 81px;
+    transform: rotate(360deg);
+  }
+}
+
 .circle-btn-shadow {
-  filter: drop-shadow(0 0 0.75rem rgba(0, 0, 0, 0.1));
+  filter: drop-shadow(0 4px 20px rgba(0, 0, 0, 0.1));
+  border-radius: 50%;
 }
 
 .circle-btn-shadow-show {
