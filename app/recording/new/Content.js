@@ -16,6 +16,7 @@ export const Content = () => {
   const [recording, setRecording] = useState("ready");
   const [recordingTime, setRecordingTime] = useState("00:00");
   const [audioUrl, setAudioUrl] = useState(null); // New state to store the recorded audio URL
+  const [audioBlobState, setAudioBlobState] = useState(null);
 
   const { permissionState, requestMicrophone } = useMicrophonePermission();
   const recognitionRef = useRef(null);
@@ -80,6 +81,7 @@ export const Content = () => {
         const audioBlob = new Blob(audioChunksRef.current, {
           type: "audio/wav",
         });
+        setAudioBlobState(audioBlob);
         const audioUrl = URL.createObjectURL(audioBlob);
         setAudioUrl(audioUrl);
         if (audioRef.current) {
@@ -107,6 +109,18 @@ export const Content = () => {
     console.log(audioUrl);
   };
 
+  const uploadAudioToS3 = async (audioBlob) => {
+    try {
+      const formData = new FormData();
+      formData.append("audio", audioBlob, "recorded-audio.wav");
+
+      await axios.post("/api/upload-to-s3", formData);
+      console.log("Audio uploaded to S3 successfully");
+    } catch (error) {
+      console.error("Error uploading audio to S3:", error);
+    }
+  };
+
   useEffect(() => {
     if (recording === "recording") {
       let time = 0;
@@ -117,7 +131,7 @@ export const Content = () => {
         setRecordingTime(
           `${minutes < 10 ? `0${minutes}` : minutes}:${
             seconds < 10 ? `0${seconds}` : seconds
-          }`,
+          }`
         );
       }, 1000);
       return () => clearInterval(interval);
@@ -138,20 +152,60 @@ export const Content = () => {
       <ScreenCenterLayout>
         <div className="flex flex-col items-center justify-center">
           <div className="font-[600] text-[30px] text-center">
-            수지가 오늘 가장 좋아한 <br /> 음식은 무엇인가요?
+            수지가 오늘 가장 좋아한 <br /> 음식은 무엇인가요?{" "}
+            <button
+              onClick={() => {
+                console.log("upload");
+                uploadAudioToS3(audioBlobState);
+              }}
+            >
+              업로드
+            </button>
           </div>
           <div className="flex space-x-[3px] mt-[130px] items-center h-[132px]">
             <div
-              className={`${styles.circle_default} ${recording === "recording" || recording === "finished" ? styles.circle_recording : "bg-[#D4D4D4]"} ${recording === "recording" ? styles.circle_animation1 : "h-[90px]"}`}
+              className={`${styles.circle_default} ${
+                recording === "recording" || recording === "finished"
+                  ? styles.circle_recording
+                  : "bg-[#D4D4D4]"
+              } ${
+                recording === "recording"
+                  ? styles.circle_animation1
+                  : "h-[90px]"
+              }`}
             ></div>
             <div
-              className={`${styles.circle_default} ${recording === "recording" || recording === "finished" ? styles.circle_recording : "bg-[#D4D4D4]"} ${recording === "recording" ? styles.circle_animation2 : "h-[100px]"}`}
+              className={`${styles.circle_default} ${
+                recording === "recording" || recording === "finished"
+                  ? styles.circle_recording
+                  : "bg-[#D4D4D4]"
+              } ${
+                recording === "recording"
+                  ? styles.circle_animation2
+                  : "h-[100px]"
+              }`}
             ></div>
             <div
-              className={`${styles.circle_default} ${recording === "recording" || recording === "finished" ? styles.circle_recording : "bg-[#D4D4D4]"} ${recording === "recording" ? styles.circle_animation3 : "h-[132px]"}`}
+              className={`${styles.circle_default} ${
+                recording === "recording" || recording === "finished"
+                  ? styles.circle_recording
+                  : "bg-[#D4D4D4]"
+              } ${
+                recording === "recording"
+                  ? styles.circle_animation3
+                  : "h-[132px]"
+              }`}
             ></div>
             <div
-              className={`${styles.circle_default} ${recording === "recording" ? styles.circle_recording : "bg-[#D4D4D4]"} ${recording === "recording" ? styles.circle_animation4 : "h-[92px]"}`}
+              className={`${styles.circle_default} ${
+                recording === "recording"
+                  ? styles.circle_recording
+                  : "bg-[#D4D4D4]"
+              } ${
+                recording === "recording"
+                  ? styles.circle_animation4
+                  : "h-[92px]"
+              }`}
             ></div>
           </div>
 
