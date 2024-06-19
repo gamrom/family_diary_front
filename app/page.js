@@ -2,6 +2,7 @@ import { fetcher } from "@/utils/fetcher";
 import { cookies } from "next/headers";
 
 import { redirect } from "next/navigation";
+import { Logout } from "./_components/Logout";
 
 async function getCurrentUser() {
   const res = await fetcher(`/current_user`, cookies());
@@ -19,5 +20,10 @@ export default async function Home() {
     redirect("/login");
   }
 
-  return <>로그인 완료</>
+  return (
+    <div className="flex flex-col my-1">
+      <Logout />
+      <a href="/recording/new">오늘 일기 작성하러 가기</a>
+    </div>
+  );
 }
