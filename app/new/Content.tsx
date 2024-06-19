@@ -1,7 +1,6 @@
 "use client";
 
 import { ClosePageNav } from "../_components/ClosePageNav";
-import { ScreenCenterLayout } from "../_components/ScreenCenterLayout";
 import dayjs, { Dayjs } from "dayjs";
 import "dayjs/locale/ko";
 import {
@@ -13,12 +12,10 @@ import {
   useDisclosure,
 } from "@nextui-org/modal";
 import Calendar from "react-calendar";
-import "./new.css";
 import { useRef, useEffect, useState } from "react";
 
-import { parseDate } from "@internationalized/date";
-
 import "react-calendar/dist/Calendar.css";
+
 import Image from "next/image";
 import { BottomFix } from "../_components/BottomFix";
 dayjs.locale("ko");
@@ -67,7 +64,7 @@ export const Content = () => {
   };
 
   return (
-    <div className="bottom-margin">
+    <div>
       <ClosePageNav>
         <button
           onClick={onOpen}
