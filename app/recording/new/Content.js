@@ -8,60 +8,124 @@ import styles from "./RecordingPage.module.scss";
 import axios from "axios";
 
 import { useState, useEffect, useRef } from "react";
+import { useMicrophonePermission } from "@/app/_hooks/useMicrophoneAccess";
 
 export const Content = () => {
-  // State variables to manage recording status, completion, and transcript
-  const [isRecording, setIsRecording] = useState(false);
-  const [recordingComplete, setRecordingComplete] = useState(false);
+  const audioRef = useRef(null);
   const [transcript, setTranscript] = useState("");
   const [recording, setRecording] = useState("ready");
+  const [recordingTime, setRecordingTime] = useState("00:00");
+  const [audioUrl, setAudioUrl] = useState(null); // New state to store the recorded audio URL
 
-  // Reference to store the SpeechRecognition instance
+  const { permissionState, requestMicrophone } = useMicrophonePermission();
   const recognitionRef = useRef(null);
+  const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
+  const mediaStreamRef = useRef(null);
 
-  // Function to start recording
-  const startRecording = () => {
-    setRecording("recording");
-    setIsRecording(true);
-    // Create a new SpeechRecognition instance and configure it
-    recognitionRef.current = new window.webkitSpeechRecognition();
-    recognitionRef.current.continuous = true;
-    recognitionRef.current.interimResults = true;
+  const startRecording = async () => {
+    setRecording("00:00");
+    if (permissionState === "prompt") {
+      requestMicrophone();
+      return;
+    }
 
-    // Event handler for speech recognition results
-    recognitionRef.current.onresult = (event) => {
-      const { transcript } = event.results[event.results.length - 1][0];
+    if (permissionState === "granted") {
+      setRecording("recording");
 
-      // Log the recognition results and update the transcript state
-      console.log(event.results);
-      setTranscript(transcript);
-    };
+      // Start speech recognition
+      recognitionRef.current = new window.webkitSpeechRecognition();
+      recognitionRef.current.continuous = true;
+      recognitionRef.current.interimResults = true;
+      recognitionRef.current.onresult = (event) => {
+        const { transcript } = event.results[event.results.length - 1][0];
+        setTranscript(transcript);
+      };
+      recognitionRef.current.start();
 
-    // Start the speech recognition
-    recognitionRef.current.start();
+      // Start audio recording
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaStreamRef.current = stream; // Save the media stream
+      mediaRecorderRef.current = new MediaRecorder(stream);
+      audioChunksRef.current = [];
+      mediaRecorderRef.current.ondataavailable = (event) => {
+        audioChunksRef.current.push(event.data);
+      };
+      mediaRecorderRef.current.start();
+    }
   };
 
-  // Cleanup effect when the component unmounts
   useEffect(() => {
     return () => {
-      // Stop the speech recognition if it's active
       if (recognitionRef.current) {
         recognitionRef.current.stop();
+      }
+      if (mediaRecorderRef.current) {
+        mediaRecorderRef.current.stop();
+      }
+      if (mediaStreamRef.current) {
+        mediaStreamRef.current.getTracks().forEach((track) => track.stop());
       }
     };
   }, []);
 
-  // Function to stop recording
   const stopRecording = () => {
     setRecording("finished");
     if (recognitionRef.current) {
-      // Stop the speech recognition and mark recording as complete
       recognitionRef.current.stop();
-      setRecordingComplete(true);
+    }
+    if (mediaRecorderRef.current) {
+      mediaRecorderRef.current.stop();
+      mediaRecorderRef.current.onstop = () => {
+        const audioBlob = new Blob(audioChunksRef.current, {
+          type: "audio/wav",
+        });
+        const audioUrl = URL.createObjectURL(audioBlob);
+        setAudioUrl(audioUrl);
+        if (audioRef.current) {
+          audioRef.current.src = audioUrl;
+        }
+      };
+    }
+    if (mediaStreamRef.current) {
+      mediaStreamRef.current.getTracks().forEach((track) => track.stop());
+      mediaStreamRef.current = null; // Clear the media stream
     }
   };
 
-  const handleSubmit = () => {};
+  const rePlay = () => {
+    if (audioRef.current && audioUrl) {
+      audioRef.current.currentTime = 0; // Reset playback to the start
+      audioRef.current.play().catch((error) => {
+        console.error("Error playing audio:", error);
+      });
+    }
+  };
+
+  const handleSubmit = () => {
+    console.log(transcript);
+    const audio = new Blob([transcript], { type: "audio/wav" });
+    const formData = new FormData();
+    formData.append("audio", audio, "audio.wav");
+    // Submit the form data as needed, e.g., with axios
+  };
+
+  useEffect(() => {
+    if (recording === "recording") {
+      let time = 0;
+      const interval = setInterval(() => {
+        time += 1;
+        const minutes = Math.floor(time / 60);
+        const seconds = time % 60;
+        setRecordingTime(
+          `${minutes < 10 ? `0${minutes}` : minutes}:${
+            seconds < 10 ? `0${seconds}` : seconds
+          }`,
+        );
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [recording]);
 
   return (
     <div className="flex flex-col justify-between min-h-screen">
@@ -95,7 +159,7 @@ export const Content = () => {
           </div>
 
           <div className="text-[#89898B] font-[500] font-[Kodchasan] mt-[30px]">
-            {transcript}
+            {recordingTime}
           </div>
         </div>
       </ScreenCenterLayout>
@@ -116,7 +180,7 @@ export const Content = () => {
             <button type="button" onClick={startRecording}>
               <Image src="/repeat.svg" alt="다시녹음" width={81} height={81} />
             </button>
-            <button type="button" onClick={() => {}}>
+            <button type="button" onClick={rePlay}>
               <Image
                 src="/reRecord.svg"
                 alt="다시듣기"
@@ -130,8 +194,7 @@ export const Content = () => {
           </>
         )}
       </BottomFix>
-
-      {/* {transcript && <div>{JSON.stringify(transcript)}</div>} */}
+      {audioUrl && <audio ref={audioRef} src={audioUrl} hidden />}
     </div>
   );
 };
