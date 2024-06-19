@@ -104,10 +104,7 @@ export const Content = () => {
 
   const handleSubmit = () => {
     console.log(transcript);
-    const audio = new Blob([transcript], { type: "audio/wav" });
-    const formData = new FormData();
-    formData.append("audio", audio, "audio.wav");
-    // Submit the form data as needed, e.g., with axios
+    console.log(audioUrl);
   };
 
   useEffect(() => {
