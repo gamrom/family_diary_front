@@ -18,6 +18,7 @@ import "react-calendar/dist/Calendar.css";
 
 import Image from "next/image";
 import { BottomFix } from "../_components/BottomFix";
+import "./style.css";
 dayjs.locale("ko");
 
 export const Content = () => {
