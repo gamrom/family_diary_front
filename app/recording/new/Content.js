@@ -16,7 +16,11 @@ export const Content = () => {
   const [recording, setRecording] = useState("ready");
   const [recordingTime, setRecordingTime] = useState("00:00");
   const [audioUrl, setAudioUrl] = useState(null); // New state to store the recorded audio URL
+
+  // 노종원 생성 -> 녹음용 blob
   const [audioBlobState, setAudioBlobState] = useState(null);
+  // 노종원 생성 -> s3에 업로드된 audio url
+  const [audioLink, setAudioLink] = useState(null);
 
   const { permissionState, requestMicrophone } = useMicrophonePermission();
   const recognitionRef = useRef(null);
@@ -114,8 +118,12 @@ export const Content = () => {
       const formData = new FormData();
       formData.append("audio", audioBlob, "recorded-audio.wav");
 
-      await axios.post("/api/upload-to-s3", formData);
-      console.log("Audio uploaded to S3 successfully");
+      const response = await axios.post("/api/upload-to-s3", formData);
+      setAudioLink(response.data.data.Location);
+      console.log(
+        "Audio uploaded to S3 successfully",
+        response.data.data.Location
+      );
     } catch (error) {
       console.error("Error uploading audio to S3:", error);
     }
@@ -153,15 +161,25 @@ export const Content = () => {
         <div className="flex flex-col items-center justify-center">
           <div className="font-[600] text-[30px] text-center">
             수지가 오늘 가장 좋아한 <br /> 음식은 무엇인가요?{" "}
-            <button
-              onClick={() => {
-                console.log("upload");
-                uploadAudioToS3(audioBlobState);
-              }}
-            >
-              업로드
-            </button>
           </div>
+
+          {/* 이 코드 확인용 코드임 지우셈 나중에 시작 */}
+          <div className="flex flex-col">
+            {audioLink ? (
+              <audio controls src={audioLink}></audio>
+            ) : (
+              <button
+                className="mt-[30px] bg-[#FFD400] text-[#000000] font-[500] font-[Kodchasan] px-[30px] py-[10px] rounded-[10px]"
+                onClick={() => {
+                  console.log("upload");
+                  uploadAudioToS3(audioBlobState);
+                }}
+              >
+                업로드
+              </button>
+            )}
+          </div>
+          {/* 이 코드 확인용 코드임 지우셈 나중에 끝 */}
           <div className="flex space-x-[3px] mt-[130px] items-center h-[132px]">
             <div
               className={`${styles.circle_default} ${
