@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 const inter = Inter({ subsets: ["latin"] });
+import Script from "next/script";
 
 export const metadata: Metadata = {
   title: "family diary",
@@ -16,6 +17,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko" className="dark">
+      <head>
+        <Script
+          type="module"
+          src="https://cdn.jsdelivr.net/npm/media-chrome@3/+esm"
+        ></Script>
+      </head>
       <body
         className={`max-w-[400px] mx-auto ${inter.className} font-inter px-[34px]`}
       >
