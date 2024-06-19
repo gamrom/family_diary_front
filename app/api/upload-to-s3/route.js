@@ -19,11 +19,15 @@ export async function POST(request) {
       Key: `recorded-audio-${Date.now()}.wav`,
       Body: Buffer.from(audioFile),
       ContentType: "audio/wav",
+      ACL: "public-read", 
     };
 
-    await s3.upload(params).promise();
+    const data = await s3.upload(params).promise();
 
-    return NextResponse.json({ message: "Audio uploaded to S3 successfully" });
+    return NextResponse.json({
+      message: "Audio uploaded to S3 successfully",
+      data: data,
+    });
   } catch (error) {
     console.error("Error uploading audio to S3:", error);
     return NextResponse.json(
