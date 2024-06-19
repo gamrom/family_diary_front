@@ -5,6 +5,7 @@ import { ClosePageNav } from "@/app/_components/ClosePageNav";
 import { ScreenCenterLayout } from "@/app/_components/ScreenCenterLayout";
 import Image from "next/image";
 import styles from "./RecordingPage.module.scss";
+import axios from "axios";
 
 import { useState, useEffect, useRef } from "react";
 
@@ -17,15 +18,26 @@ export const Content = () => {
   const audioChunks = useRef([]);
   const mediaRecorder = useRef(null);
   const streamRef = useRef(null);
+  const [transcript, setTranscript] = useState("");
+  const [audioUrl, setAudioUrl] = useState(
+    "https://podcast.44bits.net/142.mp3",
+  );
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const formData = new FormData();
     if (audio) {
       formData.append("audio", audio);
     }
 
-    console.log(formData);
+    // console.log(formData);
     // console.log(transcript);
+
+    try {
+      const response = await axios.post("/api/transcripts", { audioUrl });
+      setTranscript(response.data.text);
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
 
   const stopRecording = () => {
@@ -46,8 +58,6 @@ export const Content = () => {
     const audioElement = new Audio(URL.createObjectURL(audio));
     audioElement.play();
   };
-
-  console.log(audio);
 
   useEffect(() => {
     const handleRecording = async () => {
@@ -76,7 +86,8 @@ export const Content = () => {
             const audioBlob = new Blob(audioChunks.current, {
               type: "audio/*",
             });
-            setAudio(audioBlob);
+
+            setAudioUrl(URL.createObjectURL(audioBlob));
           };
 
           mediaRecorder.current.start();
@@ -179,6 +190,8 @@ export const Content = () => {
           </>
         )}
       </BottomFix>
+
+      {/* {transcript && <div>{JSON.stringify(transcript)}</div>} */}
     </div>
   );
 };

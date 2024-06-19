@@ -29,7 +29,7 @@
     "app/recorder/Content.js",
     "app/page.js",
     "app/Recorder.js",
-    "app/api/transcribe/route.js",
+    "app/api/transcripts/route.js",
     "app/recording/new/Content.tsxx",
     "app/recording/new/Content.js"
   ],
