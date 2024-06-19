@@ -1,5 +1,5 @@
-import { Content } from "./content";
+import { Content } from "./Content";
 
-export default function RecodePage() {
+export default function Page() {
   return <Content />;
 }
