@@ -8,131 +8,132 @@ import styles from "./RecordingPage.module.scss";
 import axios from "axios";
 
 import { useState, useEffect, useRef } from "react";
+import { useMicrophonePermission } from "@/app/_hooks/useMicrophoneAccess";
 
 export const Content = () => {
-  const [recording, setRecording] = useState("ready"); // ready, recording, finished
-  const [audio, setAudio] = useState(null);
   const audioRef = useRef(null);
-  const [recordingTime, setRecordingTime] = useState("00:00");
-  const intervalRef = useRef(null);
-  const audioChunks = useRef([]);
-  const mediaRecorder = useRef(null);
-  const streamRef = useRef(null);
   const [transcript, setTranscript] = useState("");
-  const [audioUrl, setAudioUrl] = useState(
-    "https://podcast.44bits.net/142.mp3",
-  );
+  const [recording, setRecording] = useState("ready");
+  const [recordingTime, setRecordingTime] = useState("00:00");
+  const [audioUrl, setAudioUrl] = useState(null); // New state to store the recorded audio URL
 
-  const handleSubmit = async () => {
-    const formData = new FormData();
-    if (audio) {
-      formData.append("audio", audio);
+  const { permissionState, requestMicrophone } = useMicrophonePermission();
+  const recognitionRef = useRef(null);
+  const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
+  const mediaStreamRef = useRef(null);
+
+  const startRecording = async () => {
+    setRecording("00:00");
+    if (permissionState === "prompt") {
+      requestMicrophone();
+      return;
     }
 
-    // console.log(formData);
-    // console.log(transcript);
+    if (permissionState === "granted") {
+      setRecording("recording");
 
-    try {
-      const response = await axios.post("/api/transcripts", { audioUrl });
-      setTranscript(response.data.text);
-    } catch (error) {
-      console.error("Error:", error);
+      // Start speech recognition
+      recognitionRef.current = new window.webkitSpeechRecognition();
+      recognitionRef.current.continuous = true;
+      recognitionRef.current.interimResults = true;
+      recognitionRef.current.onresult = (event) => {
+        const { transcript } = event.results[event.results.length - 1][0];
+        setTranscript(transcript);
+      };
+      recognitionRef.current.start();
+
+      // Start audio recording
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaStreamRef.current = stream; // Save the media stream
+      mediaRecorderRef.current = new MediaRecorder(stream);
+      audioChunksRef.current = [];
+      mediaRecorderRef.current.ondataavailable = (event) => {
+        audioChunksRef.current.push(event.data);
+      };
+      mediaRecorderRef.current.start();
     }
-  };
-
-  const stopRecording = () => {
-    setRecording("finished");
-  };
-
-  const reRecording = () => {
-    setRecording("ready");
-    setRecordingTime("00:00");
-    setAudio(null);
-  };
-
-  const startRecording = () => {
-    setRecording("recording");
-  };
-
-  const replayRecording = () => {
-    const audioElement = new Audio(URL.createObjectURL(audio));
-    audioElement.play();
   };
 
   useEffect(() => {
-    const handleRecording = async () => {
-      if (recording === "recording") {
-        let seconds = 0;
-        intervalRef.current = setInterval(() => {
-          seconds += 1;
-          setRecordingTime(
-            new Date(seconds * 1000).toISOString().substr(14, 5),
-          );
-        }, 1000);
-
-        try {
-          const stream = await navigator.mediaDevices.getUserMedia({
-            audio: true,
-          });
-          streamRef.current = stream;
-          mediaRecorder.current = new MediaRecorder(stream);
-          audioChunks.current = [];
-
-          mediaRecorder.current.ondataavailable = (event) => {
-            audioChunks.current.push(event.data);
-          };
-
-          mediaRecorder.current.onstop = () => {
-            const audioBlob = new Blob(audioChunks.current, {
-              type: "audio/*",
-            });
-
-            setAudioUrl(URL.createObjectURL(audioBlob));
-          };
-
-          mediaRecorder.current.start();
-        } catch (error) {
-          console.error("Error accessing media devices:", error);
-        }
-      } else if (recording === "finished" || recording === "ready") {
-        if (
-          mediaRecorder.current &&
-          mediaRecorder.current.state !== "inactive"
-        ) {
-          mediaRecorder.current.stop();
-        }
-        if (streamRef.current) {
-          streamRef.current.getTracks().forEach((track) => track.stop());
-          streamRef.current = null;
-        }
-        clearInterval(intervalRef.current);
-      }
-    };
-
-    handleRecording();
-
     return () => {
-      if (mediaRecorder.current && mediaRecorder.current.state !== "inactive") {
-        mediaRecorder.current.stop();
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
       }
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach((track) => track.stop());
-        streamRef.current = null;
+      if (mediaRecorderRef.current) {
+        mediaRecorderRef.current.stop();
       }
-      clearInterval(intervalRef.current);
+      if (mediaStreamRef.current) {
+        mediaStreamRef.current.getTracks().forEach((track) => track.stop());
+      }
     };
+  }, []);
+
+  const stopRecording = () => {
+    setRecording("finished");
+    if (recognitionRef.current) {
+      recognitionRef.current.stop();
+    }
+    if (mediaRecorderRef.current) {
+      mediaRecorderRef.current.stop();
+      mediaRecorderRef.current.onstop = () => {
+        const audioBlob = new Blob(audioChunksRef.current, {
+          type: "audio/wav",
+        });
+        const audioUrl = URL.createObjectURL(audioBlob);
+        setAudioUrl(audioUrl);
+        if (audioRef.current) {
+          audioRef.current.src = audioUrl;
+        }
+      };
+    }
+    if (mediaStreamRef.current) {
+      mediaStreamRef.current.getTracks().forEach((track) => track.stop());
+      mediaStreamRef.current = null; // Clear the media stream
+    }
+  };
+
+  const rePlay = () => {
+    if (audioRef.current && audioUrl) {
+      audioRef.current.currentTime = 0; // Reset playback to the start
+      audioRef.current.play().catch((error) => {
+        console.error("Error playing audio:", error);
+      });
+    }
+  };
+
+  const handleSubmit = () => {
+    console.log(transcript);
+    console.log(audioUrl);
+  };
+
+  useEffect(() => {
+    if (recording === "recording") {
+      let time = 0;
+      const interval = setInterval(() => {
+        time += 1;
+        const minutes = Math.floor(time / 60);
+        const seconds = time % 60;
+        setRecordingTime(
+          `${minutes < 10 ? `0${minutes}` : minutes}:${
+            seconds < 10 ? `0${seconds}` : seconds
+          }`,
+        );
+      }, 1000);
+      return () => clearInterval(interval);
+    }
   }, [recording]);
 
   return (
     <div className="flex flex-col justify-between min-h-screen">
       <ClosePageNav></ClosePageNav>
-      <input
+      {/* <input
         ref={audioRef}
         className="hidden"
         type="file"
         accept="audio/*"
         id="audio"
-      />
+      /> */}
 
       <ScreenCenterLayout>
         <div className="flex flex-col items-center justify-center">
@@ -162,7 +163,7 @@ export const Content = () => {
 
       <BottomFix>
         {recording === "ready" && (
-          <button type="button" onClick={() => startRecording()}>
+          <button type="button" onClick={startRecording}>
             <Image src="/circle.svg" alt="준비" width={81} height={81} />
           </button>
         )}
@@ -173,10 +174,10 @@ export const Content = () => {
         )}
         {recording === "finished" && (
           <>
-            <button type="button" onClick={() => reRecording()}>
+            <button type="button" onClick={startRecording}>
               <Image src="/repeat.svg" alt="다시녹음" width={81} height={81} />
             </button>
-            <button type="button" onClick={() => replayRecording()}>
+            <button type="button" onClick={rePlay}>
               <Image
                 src="/reRecord.svg"
                 alt="다시듣기"
@@ -184,14 +185,13 @@ export const Content = () => {
                 height={81}
               />
             </button>
-            <button type="button" onClick={() => handleSubmit()}>
+            <button type="button" onClick={handleSubmit}>
               <Image src="/upload.svg" alt="업로드" width={81} height={81} />
             </button>
           </>
         )}
       </BottomFix>
-
-      {/* {transcript && <div>{JSON.stringify(transcript)}</div>} */}
+      {audioUrl && <audio ref={audioRef} src={audioUrl} hidden />}
     </div>
   );
 };
