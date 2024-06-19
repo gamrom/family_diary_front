@@ -34,6 +34,7 @@ export const login = (data) => {
 export const postKakaoAuth = (data) => {
   return api.post("/users/kakao", data);
 };
+
 export const register = (data) => {
   return api.post("/signup", data, {
     headers: {
