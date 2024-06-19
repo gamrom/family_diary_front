@@ -119,7 +119,22 @@ export const Content = () => {
             boxShadow: "0px 4px 20px 1px #0000001A",
           }}
         >
-          <div className="font-[600] text-xs">오늘의 사진</div>
+          <div className="flex items-center justify-between">
+            <div className="font-[600] text-xs">오늘의 사진</div>
+            {!!sendParams.image ? (
+              <button type="button" onClick={addImage}>
+                <Image
+                  src="/reload.svg"
+                  width={14}
+                  height={14}
+                  alt="사진다시"
+                />
+              </button>
+            ) : (
+              <div className="invisible w-[14px] h-[14px]"></div>
+            )}
+          </div>
+
           {!!sendParams.image ? (
             <div>
               <Image
