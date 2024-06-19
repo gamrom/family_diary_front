@@ -10,6 +10,7 @@ import { ProgressComp } from "./ProgressComp";
 
 import { useState, useEffect, useRef } from "react";
 import { useMicrophonePermission } from "@/app/_hooks/useMicrophoneAccess";
+import { Loading } from "@/app/_components/Loading";
 
 export const Content = () => {
   const audioRef = useRef(null);
@@ -136,16 +137,36 @@ export const Content = () => {
     console.log(audioUrl);
   };
 
-  const uploadAudioToS3 = async (audioBlob) => {
-    try {
-      const formData = new FormData();
-      formData.append("audio", audioBlob, "recorded-audio.wav");
+  //노종원의 원래 코드
+  // const uploadAudioToS3 = async (audioBlob) => {
+  //   try {
+  //     const formData = new FormData();
+  //     formData.append("audio", audioBlob, "recorded-audio.wav");
 
-      await axios.post("/api/upload-to-s3", formData);
-      console.log("Audio uploaded to S3 successfully");
-    } catch (error) {
-      console.error("Error uploading audio to S3:", error);
-    }
+  //     await axios.post("/api/upload-to-s3", formData);
+  //     console.log("Audio uploaded to S3 successfully");
+  //   } catch (error) {
+  //     console.error("Error uploading audio to S3:", error);
+  //   }
+  // };
+
+  //로딩을 추가한 김은식의 코드
+  const [isLoading, setLoading] = useState(false);
+  const uploadAudioToS3 = (audioBlob) => {
+    setLoading(true);
+    const formData = new FormData();
+    formData.append("audio", audioBlob, "recorded-audio.wav");
+    axios
+      .post("/api/upload-to-s3", formData)
+      .then(() => {
+        console.log("Audio uploaded to S3 successfully");
+      })
+      .catch((error) => {
+        console.error("Error uploading audio to S3:", error);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   useEffect(() => {
@@ -245,6 +266,7 @@ export const Content = () => {
         )}
       </BottomFix>
       {audioUrl && <audio ref={audioRef} src={audioUrl} hidden />}
+      {isLoading && <Loading isLoading={isLoading} />}
     </div>
   );
 };
