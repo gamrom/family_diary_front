@@ -6,6 +6,7 @@ import { ScreenCenterLayout } from "@/app/_components/ScreenCenterLayout";
 import Image from "next/image";
 import styles from "./RecordingPage.module.scss";
 import axios from "axios";
+import { ProgressComp } from "./ProgressComp";
 
 import { useState, useEffect, useRef } from "react";
 import { useMicrophonePermission } from "@/app/_hooks/useMicrophoneAccess";
@@ -23,8 +24,10 @@ export const Content = () => {
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
   const mediaStreamRef = useRef(null);
+  const [progress, setProgress] = useState(0);
 
   const startRecording = async () => {
+    setProgress(0);
     setRecording("00:00");
     if (permissionState === "prompt") {
       requestMicrophone();
@@ -95,12 +98,36 @@ export const Content = () => {
     }
   };
 
+  console.log(progress);
+
   const rePlay = () => {
     if (audioRef.current && audioUrl) {
+      //reset
+      setProgress(0);
+      setRecordingTime("00:00");
+
       audioRef.current.currentTime = 0; // Reset playback to the start
       audioRef.current.play().catch((error) => {
         console.error("Error playing audio:", error);
       });
+
+      audioRef.current.ontimeupdate = () => {
+        const progress =
+          (audioRef.current.currentTime / audioRef.current.duration) * 100;
+        setProgress(progress);
+        const minutes = Math.floor(audioRef.current.currentTime / 60);
+        const seconds = Math.floor(audioRef.current.currentTime % 60);
+        setRecordingTime(
+          `${minutes < 10 ? `0${minutes}` : minutes}:${
+            seconds < 10 ? `0${seconds}` : seconds
+          }`,
+        );
+      };
+
+      audioRef.current.onended = () => {
+        setProgress(100);
+        setRecordingTime("00:00");
+      };
     }
   };
 
@@ -131,7 +158,7 @@ export const Content = () => {
         setRecordingTime(
           `${minutes < 10 ? `0${minutes}` : minutes}:${
             seconds < 10 ? `0${seconds}` : seconds
-          }`
+          }`,
         );
       }, 1000);
       return () => clearInterval(interval);
@@ -163,50 +190,7 @@ export const Content = () => {
             </button>
           </div>
           <div className="flex space-x-[3px] mt-[130px] items-center h-[132px]">
-            <div
-              className={`${styles.circle_default} ${
-                recording === "recording" || recording === "finished"
-                  ? styles.circle_recording
-                  : "bg-[#D4D4D4]"
-              } ${
-                recording === "recording"
-                  ? styles.circle_animation1
-                  : "h-[90px]"
-              }`}
-            ></div>
-            <div
-              className={`${styles.circle_default} ${
-                recording === "recording" || recording === "finished"
-                  ? styles.circle_recording
-                  : "bg-[#D4D4D4]"
-              } ${
-                recording === "recording"
-                  ? styles.circle_animation2
-                  : "h-[100px]"
-              }`}
-            ></div>
-            <div
-              className={`${styles.circle_default} ${
-                recording === "recording" || recording === "finished"
-                  ? styles.circle_recording
-                  : "bg-[#D4D4D4]"
-              } ${
-                recording === "recording"
-                  ? styles.circle_animation3
-                  : "h-[132px]"
-              }`}
-            ></div>
-            <div
-              className={`${styles.circle_default} ${
-                recording === "recording"
-                  ? styles.circle_recording
-                  : "bg-[#D4D4D4]"
-              } ${
-                recording === "recording"
-                  ? styles.circle_animation4
-                  : "h-[92px]"
-              }`}
-            ></div>
+            <ProgressComp percent={progress} />
           </div>
 
           <div className="text-[#89898B] font-[500] font-[Kodchasan] mt-[30px]">
@@ -217,32 +201,47 @@ export const Content = () => {
 
       <BottomFix>
         {recording === "ready" && (
-          <button type="button" onClick={startRecording}>
+          <button
+            type="button"
+            className="circle-btn-shadow"
+            onClick={startRecording}
+          >
             <Image src="/circle.svg" alt="준비" width={81} height={81} />
           </button>
         )}
         {recording === "recording" && (
-          <button type="button" onClick={() => stopRecording()}>
-            <Image src="/stop.svg" alt="일시정지" width={81} height={81} />
+          <button
+            type="button"
+            className="w-[81px] h-[81px] circle-btn-shadow rounded-full bg-white flex items-center justify-center"
+            onClick={() => stopRecording()}
+          >
+            <Image src="/square.svg" alt="일시정지" width={25} height={25} />
           </button>
         )}
         {recording === "finished" && (
-          <>
-            <button type="button" onClick={startRecording}>
-              <Image src="/repeat.svg" alt="다시녹음" width={81} height={81} />
+          <div className="flex gap-[28px]">
+            <button
+              type="button"
+              className="w-[81px] h-[81px] circle-btn-shadow rounded-full bg-white flex items-center justify-center"
+              onClick={startRecording}
+            >
+              <Image src="/refresh.svg" alt="다시녹음" width={23} height={23} />
             </button>
-            <button type="button" onClick={rePlay}>
-              <Image
-                src="/reRecord.svg"
-                alt="다시듣기"
-                width={81}
-                height={81}
-              />
+            <button
+              type="button"
+              className="w-[81px] h-[81px] circle-btn-shadow rounded-full bg-white flex items-center justify-center pl-2"
+              onClick={rePlay}
+            >
+              <Image src="/play.svg" alt="다시듣기" width={25} height={28} />
             </button>
-            <button type="button" onClick={handleSubmit}>
-              <Image src="/upload.svg" alt="업로드" width={81} height={81} />
+            <button
+              type="button"
+              className="w-[81px] h-[81px] circle-btn-shadow rounded-full bg-white flex items-center justify-center"
+              onClick={handleSubmit}
+            >
+              <Image src="/arrow_top.svg" alt="업로드" width={26} height={24} />
             </button>
-          </>
+          </div>
         )}
       </BottomFix>
       {audioUrl && <audio ref={audioRef} src={audioUrl} hidden />}
