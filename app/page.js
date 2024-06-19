@@ -1,8 +1,8 @@
-import { fetcher } from "@/utils/fetcher";
+import { fetcher } from "@/app/_hooks/fetcher";
 import { cookies } from "next/headers";
 
 import { redirect } from "next/navigation";
-import { Logout } from "./_components/Logout";
+import { Logout } from "@/app/_components/Logout";
 
 async function getCurrentUser() {
   const res = await fetcher(`/current_user`, cookies());

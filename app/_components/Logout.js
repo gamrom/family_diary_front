@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { logout } from "@/utils/api";
+import { logout } from "@/app/_hooks/api";
 
 export const Logout = () => {
   const router = useRouter();

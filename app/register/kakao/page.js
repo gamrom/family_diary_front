@@ -3,7 +3,7 @@
 import React, { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-import { postKakaoAuth } from "@/utils/api";
+import { postKakaoAuth } from "@/app/_hooks/api";
 
 export default function Page() {
   const router = useRouter();

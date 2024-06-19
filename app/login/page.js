@@ -1,4 +1,5 @@
 import Image from "next/image";
+
 import KakaoButton from "@/app/_components/KakaoButton";
 
 export default function Home() {

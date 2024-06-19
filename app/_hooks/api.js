@@ -1,13 +1,5 @@
 import axios from "axios";
 
-const baseURL = process.env.NEXT_PUBLIC_API_URL;
-const fetchOptions = (cookies) => {
-  return {
-    credentials: "include",
-    headers: { Cookie: cookies().toString() },
-  };
-};
-
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
   withCredentials: true,
