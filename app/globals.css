@@ -49,3 +49,44 @@
 .react-calendar__tile:hover {
   background-color: #ffd5d4 !important  ;
 }
+
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* semi-transparent black background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999; /* ensure it's on top of everything */
+}
+
+.loading-spinner {
+  background-image: url("/circle_char.svg");
+  border-radius: 50%; /* circle shape */
+  background-position: center;
+  background-size: cover;
+  width: 81px;
+  height: 81px;
+  animation: spin 1s linear infinite; /* spinning animation */
+  filter: drop-shadow(0px 1px 12px white);
+}
+
+@keyframes spin {
+  0% {
+    width: 81px;
+    height: 81px;
+    transform: rotate(0deg);
+  }
+  50% {
+    width: 106px;
+    height: 106px;
+  }
+  100% {
+    width: 81px;
+    height: 81px;
+    transform: rotate(360deg);
+  }
+}

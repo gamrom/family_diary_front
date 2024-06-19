@@ -1,36 +1,22 @@
 "use client";
 import Image from "next/image";
-import { BottomFix } from "../../_components/BottomFix";
-import { ClosePageNav } from "@/app/_components/ClosePageNav";
-import dayjs, { Dayjs } from "dayjs";
+import dayjs from "dayjs";
 import "dayjs/locale/ko";
 dayjs.locale("ko");
+import { useState } from "react";
 
-import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  useDisclosure,
-} from "@nextui-org/modal";
-import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import "./style.css";
+import { Loading } from "../../_components/Loading";
 
 import {
   MediaController,
   MediaPlayButton,
-  MediaSeekBackwardButton,
-  MediaSeekForwardButton,
   MediaTimeRange,
   MediaTimeDisplay,
-  MediaMuteButton,
-  MediaVolumeRange,
 } from "media-chrome/react";
 
 export const Content = () => {
-  // const { isOpen, onOpen, onOpenChange } = useDisclosure();
   return (
     <div className="flex flex-col items-center">
       <div className="mt-[20px] relative">
@@ -83,6 +69,7 @@ export const Content = () => {
       </MediaController>
 
       <div className="show-bg"></div>
+      <Loading />
     </div>
   );
 };
