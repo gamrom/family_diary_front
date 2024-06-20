@@ -11,6 +11,7 @@ import { ProgressComp } from "./ProgressComp";
 import { useState, useEffect, useRef } from "react";
 import { useMicrophonePermission } from "@/app/_hooks/useMicrophoneAccess";
 import { Loading } from "@/app/_components/Loading";
+import { recommendSentences } from "@/app/constants";
 
 export const Content = () => {
   const audioRef = useRef(null);
@@ -200,7 +201,11 @@ export const Content = () => {
       <ScreenCenterLayout>
         <div className="flex flex-col items-center justify-center">
           <div className="font-[600] text-[30px] text-center">
-            수지가 오늘 가장 좋아한 <br /> 음식은 무엇인가요?{" "}
+            {
+              recommendSentences[
+                Math.floor(Math.random() * recommendSentences.length)
+              ]
+            }
             <button
               onClick={() => {
                 console.log("upload");
