@@ -23,7 +23,7 @@ export const Content = () => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [selectDay, setSelectDay] = useState(dayjs());
   return (
-    <div className="h-screen flex flex-col justify-between">
+    <div>
       <ClosePageNav>
         <button
           onClick={onOpen}

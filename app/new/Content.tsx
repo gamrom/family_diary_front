@@ -64,7 +64,7 @@ export const Content = () => {
   };
 
   return (
-    <div>
+    <div className="h-screen flex justify-between flex-col">
       <ClosePageNav>
         <button
           onClick={onOpen}
