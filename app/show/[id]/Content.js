@@ -25,6 +25,7 @@ import {
   MediaTimeDisplay,
 } from "media-chrome/react";
 import { LoadingTransform } from "./LoadingTransform";
+import { BackBtn } from "@/app/_components/BackBtn";
 
 export const Content = () => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -38,12 +39,26 @@ export const Content = () => {
     setIsLoading(true);
   };
 
+  //calculate progress when audio is playing after click MediaPlayButton
   useEffect(() => {
-    audioRef.current?.addEventListener("timeupdate", () => {
-      setProgress(
-        (audioRef.current.currentTime / audioRef.current.duration) * 100,
-      );
-    });
+    if (audioRef.current) {
+      const audio = audioRef.current;
+      const onTimeUpdate = () => {
+        const progress = (audio.currentTime / audio.duration) * 100;
+        setProgress(progress);
+      };
+      audio.addEventListener("timeupdate", onTimeUpdate);
+      return () => {
+        audio.removeEventListener("timeupdate", onTimeUpdate);
+      };
+    }
+  }, [audioRef.current]);
+
+  console.log(progress);
+
+  const [audioLoading, setAudioLoading] = useState(true);
+  useEffect(() => {
+    setAudioLoading(false);
   }, []);
 
   return (
@@ -62,6 +77,10 @@ export const Content = () => {
           <div className="text-[25px]">{dayjs().format("M월")}</div>
           <div className="text-[25px]">{dayjs().format("DD일")}</div>
         </div>
+
+        <BackBtn style="absolute flex flex-col text-white top-[15px] right-[20px] font-[600]">
+          <Image src="/x_white.svg" width={13} height={13} alt="닫기" />
+        </BackBtn>
       </div>
 
       <div className="text-white px-4 text-center h-[140px] overflow-auto show-text mt-[44px] relative">
@@ -74,39 +93,41 @@ export const Content = () => {
         </div>
       </div>
 
-      <MediaController
-        audio
-        className="bg-transparent mt-[31px] w-full flex-col items-center justify-center"
-      >
-        <audio ref={audioRef} slot="media" src="/sample_voice.wav"></audio>
-        <div className="flex items-center justify-center gap-4">
-          <ProgressComp percent={progress} />
-          <MediaTimeDisplay className="bg-transparent"></MediaTimeDisplay>
-        </div>
-        <div className="flex mt-[30px] items-center justify-between">
-          <button
-            type="button"
-            className="!bg-transparent  w-[81px] h-[81px] circle-btn-shadow-show rounded-full bg-white flex items-center justify-center"
-          >
-            <Image
-              src="/arrow_down.svg"
-              width={26}
-              height={25}
-              alt="재생"
-            ></Image>
-          </button>
-          <MediaPlayButton className="!bg-transparent  w-[81px] h-[81px] circle-btn-shadow-show rounded-full bg-white flex items-center justify-center">
-            <Image src="/play.svg" width={36} height={36} alt="재생"></Image>
-          </MediaPlayButton>
-          <button
-            type="button"
-            onClick={onOpen}
-            className="!bg-transparent  w-[81px] h-[81px] circle-btn-shadow-show rounded-full bg-white flex items-center justify-center"
-          >
-            <Image src="/print.svg" width={32} height={28} alt="재생"></Image>
-          </button>
-        </div>
-      </MediaController>
+      {!audioLoading && (
+        <MediaController
+          audio
+          className="bg-transparent mt-[31px] w-full flex-col items-center justify-center"
+        >
+          <audio ref={audioRef} slot="media" src="/sample_voice.wav"></audio>
+          <div className="flex items-center justify-center gap-4">
+            <ProgressComp percent={progress} />
+            <MediaTimeDisplay className="bg-transparent"></MediaTimeDisplay>
+          </div>
+          <div className="flex mt-[30px] items-center justify-between">
+            <button
+              type="button"
+              className="!bg-transparent  w-[81px] h-[81px] circle-btn-shadow-show rounded-full bg-white flex items-center justify-center"
+            >
+              <Image
+                src="/arrow_down.svg"
+                width={26}
+                height={25}
+                alt="재생"
+              ></Image>
+            </button>
+            <MediaPlayButton className="!bg-transparent  w-[81px] h-[81px] circle-btn-shadow-show rounded-full bg-white flex items-center justify-center">
+              <Image src="/play.svg" width={36} height={36} alt="재생"></Image>
+            </MediaPlayButton>
+            <button
+              type="button"
+              onClick={onOpen}
+              className="!bg-transparent  w-[81px] h-[81px] circle-btn-shadow-show rounded-full bg-white flex items-center justify-center"
+            >
+              <Image src="/print.svg" width={32} height={28} alt="재생"></Image>
+            </button>
+          </div>
+        </MediaController>
+      )}
 
       <div className="show-bg"></div>
 
