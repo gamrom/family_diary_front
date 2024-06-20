@@ -6,9 +6,13 @@ import { ScreenCenterLayout } from "@/app/_components/ScreenCenterLayout";
 import Image from "next/image";
 import styles from "./RecordingPage.module.scss";
 import axios from "axios";
+import { ProgressComp } from "./ProgressComp";
 
 import { useState, useEffect, useRef } from "react";
 import { useMicrophonePermission } from "@/app/_hooks/useMicrophoneAccess";
+import { Loading } from "@/app/_components/Loading";
+import { recommendSentences } from "@/app/constants";
+import { RecordingComp } from "./RecordingComp";
 
 export const Content = () => {
   const audioRef = useRef(null);
@@ -19,16 +23,23 @@ export const Content = () => {
 
   // 노종원 생성 -> 녹음용 blob
   const [audioBlobState, setAudioBlobState] = useState(null);
-  // 노종원 생성 -> s3에 업로드된 audio url
-  const [audioLink, setAudioLink] = useState(null);
+  const [recommendText, setRecommendText] = useState("");
+
+  useEffect(() => {
+    setRecommendText(
+      recommendSentences[Math.floor(Math.random() * recommendSentences.length)]
+    );
+  }, []);
 
   const { permissionState, requestMicrophone } = useMicrophonePermission();
   const recognitionRef = useRef(null);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
   const mediaStreamRef = useRef(null);
+  const [progress, setProgress] = useState(0);
 
   const startRecording = async () => {
+    setProgress(0);
     setRecording("00:00");
     if (permissionState === "prompt") {
       requestMicrophone();
@@ -99,34 +110,80 @@ export const Content = () => {
     }
   };
 
-  const rePlay = () => {
-    if (audioRef.current && audioUrl) {
-      audioRef.current.currentTime = 0; // Reset playback to the start
-      audioRef.current.play().catch((error) => {
-        console.error("Error playing audio:", error);
-      });
+  const [isReplay, setIsReplay] = useState(false);
+
+  useEffect(() => {
+    if (isReplay) {
+      if (audioRef.current && audioUrl) {
+        //reset
+        setProgress(0);
+        setRecordingTime("00:00");
+
+        audioRef.current.currentTime = 0; // Reset playback to the start
+        audioRef.current.play().catch((error) => {
+          console.error("Error playing audio:", error);
+        });
+
+        audioRef.current?.addEventListener("timeupdate", () => {
+          setProgress(
+            (audioRef.current.currentTime / audioRef.current.duration) * 100
+          );
+
+          //time
+          let time = audioRef.current.currentTime;
+          const minutes = Math.floor(audioRef.current.currentTime / 60);
+          const seconds = Math.floor(audioRef.current.currentTime % 60);
+          setRecordingTime(
+            `${minutes < 10 ? `0${minutes}` : minutes}:${
+              seconds < 10 ? `0${seconds}` : seconds
+            }`
+          );
+        });
+
+        audioRef.current.onended = () => {
+          setIsReplay(false);
+        };
+      }
     }
-  };
+  }, [isReplay]);
+
+  console.log(progress);
 
   const handleSubmit = () => {
     console.log(transcript);
     console.log(audioUrl);
   };
 
-  const uploadAudioToS3 = async (audioBlob) => {
-    try {
-      const formData = new FormData();
-      formData.append("audio", audioBlob, "recorded-audio.wav");
+  //노종원의 원래 코드
+  // const uploadAudioToS3 = async (audioBlob) => {
+  //   try {
+  //     const formData = new FormData();
+  //     formData.append("audio", audioBlob, "recorded-audio.wav");
 
-      const response = await axios.post("/api/upload-to-s3", formData);
-      setAudioLink(response.data.data.Location);
-      console.log(
-        "Audio uploaded to S3 successfully",
-        response.data.data.Location
-      );
-    } catch (error) {
-      console.error("Error uploading audio to S3:", error);
-    }
+  //     await axios.post("/api/upload-to-s3", formData);
+  //     console.log("Audio uploaded to S3 successfully");
+  //   } catch (error) {
+  //     console.error("Error uploading audio to S3:", error);
+  //   }
+  // };
+
+  //로딩을 추가한 김은식의 코드
+  const [isLoading, setLoading] = useState(false);
+  const uploadAudioToS3 = (audioBlob) => {
+    setLoading(true);
+    const formData = new FormData();
+    formData.append("audio", audioBlob, "recorded-audio.wav");
+    axios
+      .post("/api/upload-to-s3", formData)
+      .then(() => {
+        console.log("Audio uploaded to S3 successfully");
+      })
+      .catch((error) => {
+        console.error("Error uploading audio to S3:", error);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   useEffect(() => {
@@ -149,83 +206,28 @@ export const Content = () => {
   return (
     <div className="flex flex-col justify-between min-h-screen">
       <ClosePageNav></ClosePageNav>
-      {/* <input
-        ref={audioRef}
-        className="hidden"
-        type="file"
-        accept="audio/*"
-        id="audio"
-      /> */}
 
       <ScreenCenterLayout>
         <div className="flex flex-col items-center justify-center">
           <div className="font-[600] text-[30px] text-center">
-            수지가 오늘 가장 좋아한 <br /> 음식은 무엇인가요?{" "}
+            {recommendText}
+            <button
+              onClick={() => {
+                console.log("upload");
+                uploadAudioToS3(audioBlobState);
+              }}
+            >
+              업로드
+            </button>
           </div>
 
-          {/* 이 코드 확인용 코드임 지우셈 나중에 시작 */}
-          <div className="flex flex-col">
-            {audioLink ? (
-              <audio controls src={audioLink}></audio>
-            ) : (
-              <button
-                className="mt-[30px] bg-[#FFD400] text-[#000000] font-[500] font-[Kodchasan] px-[30px] py-[10px] rounded-[10px]"
-                onClick={() => {
-                  console.log("upload");
-                  uploadAudioToS3(audioBlobState);
-                }}
-              >
-                업로드
-              </button>
-            )}
-          </div>
-          {/* 이 코드 확인용 코드임 지우셈 나중에 끝 */}
-          <div className="flex space-x-[3px] mt-[130px] items-center h-[132px]">
-            <div
-              className={`${styles.circle_default} ${
-                recording === "recording" || recording === "finished"
-                  ? styles.circle_recording
-                  : "bg-[#D4D4D4]"
-              } ${
-                recording === "recording"
-                  ? styles.circle_animation1
-                  : "h-[90px]"
-              }`}
-            ></div>
-            <div
-              className={`${styles.circle_default} ${
-                recording === "recording" || recording === "finished"
-                  ? styles.circle_recording
-                  : "bg-[#D4D4D4]"
-              } ${
-                recording === "recording"
-                  ? styles.circle_animation2
-                  : "h-[100px]"
-              }`}
-            ></div>
-            <div
-              className={`${styles.circle_default} ${
-                recording === "recording" || recording === "finished"
-                  ? styles.circle_recording
-                  : "bg-[#D4D4D4]"
-              } ${
-                recording === "recording"
-                  ? styles.circle_animation3
-                  : "h-[132px]"
-              }`}
-            ></div>
-            <div
-              className={`${styles.circle_default} ${
-                recording === "recording"
-                  ? styles.circle_recording
-                  : "bg-[#D4D4D4]"
-              } ${
-                recording === "recording"
-                  ? styles.circle_animation4
-                  : "h-[92px]"
-              }`}
-            ></div>
-          </div>
+          {recording === "recording" ? (
+            <RecordingComp />
+          ) : (
+            <div className="flex space-x-[3px] mt-[130px] items-center h-[132px]">
+              <ProgressComp percent={progress} />
+            </div>
+          )}
 
           <div className="text-[#89898B] font-[500] font-[Kodchasan] mt-[30px]">
             {recordingTime}
@@ -235,35 +237,51 @@ export const Content = () => {
 
       <BottomFix>
         {recording === "ready" && (
-          <button type="button" onClick={startRecording}>
+          <button
+            type="button"
+            className="circle-btn-shadow"
+            onClick={startRecording}
+          >
             <Image src="/circle.svg" alt="준비" width={81} height={81} />
           </button>
         )}
         {recording === "recording" && (
-          <button type="button" onClick={() => stopRecording()}>
-            <Image src="/stop.svg" alt="일시정지" width={81} height={81} />
+          <button
+            type="button"
+            className="w-[81px] h-[81px] circle-btn-shadow rounded-full bg-white flex items-center justify-center"
+            onClick={() => stopRecording()}
+          >
+            <Image src="/square.svg" alt="일시정지" width={25} height={25} />
           </button>
         )}
         {recording === "finished" && (
-          <>
-            <button type="button" onClick={startRecording}>
-              <Image src="/repeat.svg" alt="다시녹음" width={81} height={81} />
+          <div className="flex gap-[28px]">
+            <button
+              type="button"
+              className="w-[81px] h-[81px] circle-btn-shadow rounded-full bg-white flex items-center justify-center"
+              onClick={startRecording}
+            >
+              <Image src="/refresh.svg" alt="다시녹음" width={23} height={23} />
             </button>
-            <button type="button" onClick={rePlay}>
-              <Image
-                src="/reRecord.svg"
-                alt="다시듣기"
-                width={81}
-                height={81}
-              />
+            <button
+              type="button"
+              className="w-[81px] h-[81px] circle-btn-shadow rounded-full bg-white flex items-center justify-center pl-2"
+              onClick={() => setIsReplay(true)}
+            >
+              <Image src="/play.svg" alt="다시듣기" width={25} height={28} />
             </button>
-            <button type="button" onClick={handleSubmit}>
-              <Image src="/upload.svg" alt="업로드" width={81} height={81} />
+            <button
+              type="button"
+              className="w-[81px] h-[81px] circle-btn-shadow rounded-full bg-white flex items-center justify-center"
+              onClick={handleSubmit}
+            >
+              <Image src="/arrow_top.svg" alt="업로드" width={26} height={24} />
             </button>
-          </>
+          </div>
         )}
       </BottomFix>
       {audioUrl && <audio ref={audioRef} src={audioUrl} hidden />}
+      {isLoading && <Loading isLoading={isLoading} />}
     </div>
   );
 };

@@ -64,7 +64,7 @@ export const Content = () => {
   };
 
   return (
-    <div>
+    <div className="h-screen flex justify-between flex-col">
       <ClosePageNav>
         <button
           onClick={onOpen}
@@ -147,7 +147,7 @@ export const Content = () => {
             </div>
           ) : (
             <button
-              className="mt-[15px] rounded-[12px] w-[287px] h-[287px] flex items-center justify-center bg-[#F5F5F5]"
+              className="mt-[15px] rounded-[12px] w-full h-[287px] flex items-center justify-center bg-[#F5F5F5]"
               type="button"
               onClick={addImage}
             >
