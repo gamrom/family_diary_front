@@ -12,6 +12,7 @@ import { useState, useEffect, useRef } from "react";
 import { useMicrophonePermission } from "@/app/_hooks/useMicrophoneAccess";
 import { Loading } from "@/app/_components/Loading";
 import { recommendSentences } from "@/app/constants";
+import { RecordingComp } from "./RecordingComp";
 
 export const Content = () => {
   const audioRef = useRef(null);
@@ -20,6 +21,13 @@ export const Content = () => {
   const [recordingTime, setRecordingTime] = useState("00:00");
   const [audioUrl, setAudioUrl] = useState(null); // New state to store the recorded audio URL
   const [audioBlobState, setAudioBlobState] = useState(null);
+  const [recommendText, setRecommendText] = useState("");
+
+  useEffect(() => {
+    setRecommendText(
+      recommendSentences[Math.floor(Math.random() * recommendSentences.length)],
+    );
+  }, []);
 
   const { permissionState, requestMicrophone } = useMicrophonePermission();
   const recognitionRef = useRef(null);
@@ -100,38 +108,44 @@ export const Content = () => {
     }
   };
 
-  console.log(progress);
+  const [isReplay, setIsReplay] = useState(false);
 
-  const rePlay = () => {
-    if (audioRef.current && audioUrl) {
-      //reset
-      setProgress(0);
-      setRecordingTime("00:00");
-
-      audioRef.current.currentTime = 0; // Reset playback to the start
-      audioRef.current.play().catch((error) => {
-        console.error("Error playing audio:", error);
-      });
-
-      audioRef.current.ontimeupdate = () => {
-        const progress =
-          (audioRef.current.currentTime / audioRef.current.duration) * 100;
-        setProgress(progress);
-        const minutes = Math.floor(audioRef.current.currentTime / 60);
-        const seconds = Math.floor(audioRef.current.currentTime % 60);
-        setRecordingTime(
-          `${minutes < 10 ? `0${minutes}` : minutes}:${
-            seconds < 10 ? `0${seconds}` : seconds
-          }`,
-        );
-      };
-
-      audioRef.current.onended = () => {
-        setProgress(100);
+  useEffect(() => {
+    if (isReplay) {
+      if (audioRef.current && audioUrl) {
+        //reset
+        setProgress(0);
         setRecordingTime("00:00");
-      };
+
+        audioRef.current.currentTime = 0; // Reset playback to the start
+        audioRef.current.play().catch((error) => {
+          console.error("Error playing audio:", error);
+        });
+
+        audioRef.current?.addEventListener("timeupdate", () => {
+          setProgress(
+            (audioRef.current.currentTime / audioRef.current.duration) * 100,
+          );
+
+          //time
+          let time = audioRef.current.currentTime;
+          const minutes = Math.floor(audioRef.current.currentTime / 60);
+          const seconds = Math.floor(audioRef.current.currentTime % 60);
+          setRecordingTime(
+            `${minutes < 10 ? `0${minutes}` : minutes}:${
+              seconds < 10 ? `0${seconds}` : seconds
+            }`,
+          );
+        });
+
+        audioRef.current.onended = () => {
+          setIsReplay(false);
+        };
+      }
     }
-  };
+  }, [isReplay]);
+
+  console.log(progress);
 
   const handleSubmit = () => {
     console.log(transcript);
@@ -190,22 +204,11 @@ export const Content = () => {
   return (
     <div className="flex flex-col justify-between min-h-screen">
       <ClosePageNav></ClosePageNav>
-      {/* <input
-        ref={audioRef}
-        className="hidden"
-        type="file"
-        accept="audio/*"
-        id="audio"
-      /> */}
 
       <ScreenCenterLayout>
         <div className="flex flex-col items-center justify-center">
           <div className="font-[600] text-[30px] text-center">
-            {
-              recommendSentences[
-                Math.floor(Math.random() * recommendSentences.length)
-              ]
-            }
+            {recommendText}
             <button
               onClick={() => {
                 console.log("upload");
@@ -215,9 +218,14 @@ export const Content = () => {
               업로드
             </button>
           </div>
-          <div className="flex space-x-[3px] mt-[130px] items-center h-[132px]">
-            <ProgressComp percent={progress} />
-          </div>
+
+          {recording === "recording" ? (
+            <RecordingComp />
+          ) : (
+            <div className="flex space-x-[3px] mt-[130px] items-center h-[132px]">
+              <ProgressComp percent={progress} />
+            </div>
+          )}
 
           <div className="text-[#89898B] font-[500] font-[Kodchasan] mt-[30px]">
             {recordingTime}
@@ -256,7 +264,7 @@ export const Content = () => {
             <button
               type="button"
               className="w-[81px] h-[81px] circle-btn-shadow rounded-full bg-white flex items-center justify-center pl-2"
-              onClick={rePlay}
+              onClick={() => setIsReplay(true)}
             >
               <Image src="/play.svg" alt="다시듣기" width={25} height={28} />
             </button>

@@ -3,7 +3,7 @@ import Image from "next/image";
 import dayjs from "dayjs";
 import "dayjs/locale/ko";
 dayjs.locale("ko");
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 
 import "react-calendar/dist/Calendar.css";
 import "./style.css";
@@ -29,24 +29,22 @@ import { LoadingTransform } from "./LoadingTransform";
 export const Content = () => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [progress, setProgress] = useState(0);
-  console.log(progress);
+
   // when play, calculate progress -> current time / total duration * 100
   const audioRef = useRef();
-  audioRef.current?.addEventListener("timeupdate", () => {
-    setProgress(
-      (audioRef.current.currentTime / audioRef.current.duration) * 100,
-    );
-  });
-
-  //audio play, progress set 0
-  audioRef.current?.addEventListener("play", () => {
-    setProgress(0);
-  });
 
   const [isLoading, setIsLoading] = useState(false);
   const onSubmit = () => {
     setIsLoading(true);
   };
+
+  useEffect(() => {
+    audioRef.current?.addEventListener("timeupdate", () => {
+      setProgress(
+        (audioRef.current.currentTime / audioRef.current.duration) * 100,
+      );
+    });
+  }, []);
 
   return (
     <div className="flex flex-col items-center">
@@ -85,7 +83,7 @@ export const Content = () => {
           <ProgressComp percent={progress} />
           <MediaTimeDisplay className="bg-transparent"></MediaTimeDisplay>
         </div>
-        <div className="flex gap-8 mt-[30px] items-center justify-center">
+        <div className="flex mt-[30px] items-center justify-between">
           <button
             type="button"
             className="!bg-transparent  w-[81px] h-[81px] circle-btn-shadow-show rounded-full bg-white flex items-center justify-center"
