@@ -30,7 +30,9 @@ import {
 import { LoadingTransform } from "./LoadingTransform";
 import { BackBtn } from "@/app/_components/BackBtn";
 
-export const Content = () => {
+import { deleteDiary } from "@/app/_hooks/api";
+
+export const Content = ({ diary }) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [progress, setProgress] = useState(0);
   const pdfBtnRef = useRef();
@@ -61,6 +63,9 @@ export const Content = () => {
     }
   }, [audioRef.current]);
 
+  console.log(progress);
+  console.log(diary?.audio_url);
+
   const [audioLoading, setAudioLoading] = useState(true);
   useEffect(() => {
     setAudioLoading(false);
@@ -70,7 +75,7 @@ export const Content = () => {
     <div className="flex flex-col items-center">
       <div className="mt-[20px] relative">
         <Image
-          src="/image_sample.png"
+          src={diary?.image_url || "/image_sample.png"}
           width={354}
           height={354}
           className="object-fit w-full rounded-[30px]"
@@ -78,9 +83,15 @@ export const Content = () => {
         />
 
         <div className="absolute flex flex-col text-white top-[15px] left-[20px] font-[600]">
-          <div className="text-[11px]">{dayjs().format("YYYY년")}</div>
-          <div className="text-[25px]">{dayjs().format("M월")}</div>
-          <div className="text-[25px]">{dayjs().format("DD일")}</div>
+          <div className="text-[11px]">
+            {dayjs(diary?.released_date?.replace(/-/g, "/")).format("YYYY년")}
+          </div>
+          <div className="text-[25px]">
+            {dayjs(diary?.released_date?.replace(/-/g, "/")).format("M월")}
+          </div>
+          <div className="text-[25px]">
+            {dayjs(diary?.released_date?.replace(/-/g, "/")).format("DD일")}
+          </div>
         </div>
 
         <BackBtn style="absolute flex flex-col text-white top-[15px] right-[20px] font-[600]">
@@ -96,13 +107,7 @@ export const Content = () => {
       ></a>
 
       <div className="text-white px-4 text-center h-[140px] overflow-auto show-text mt-[44px] relative">
-        <div>
-          Lorem ipsum, dolor sit amet consectetur adipisicing elit. Autem ut
-          illo corporis. Quam iusto sint ipsa a consequatur minima nulla officia
-          adipisci! Quidem, cumque? Iste in placeat libero blanditiis obcaecati!
-          Lorem ipsum, dolor sit amet consectetur adipisicing elit. Autem ut
-          illo
-        </div>
+        <div dangerouslySetInnerHTML={{ __html: diary?.content }}></div>
       </div>
 
       {!audioLoading && (
@@ -110,7 +115,7 @@ export const Content = () => {
           audio
           className="bg-transparent mt-[31px] w-full flex-col items-center justify-center"
         >
-          <audio ref={audioRef} slot="media" src="/sample_voice.wav"></audio>
+          <audio ref={audioRef} slot="media" src={diary?.audio_url}></audio>
           <div className="flex items-center justify-center gap-4">
             <ProgressComp percent={progress} />
             <MediaTimeDisplay className="bg-transparent"></MediaTimeDisplay>
@@ -118,13 +123,21 @@ export const Content = () => {
           <div className="flex mt-[30px] items-center justify-between">
             <button
               type="button"
-              className="!bg-transparent  w-[81px] h-[81px] circle-btn-shadow-show rounded-full bg-white flex items-center justify-center"
+              className="!bg-transparent w-[81px] h-[81px] circle-btn-shadow-show rounded-full bg-white flex items-center justify-center"
+              onClick={() => {
+                if (confirm("정말 삭제하시겠습니까?")) {
+                  deleteDiary(diary.id).then(() => {
+                    alert("삭제되었습니다.");
+                    window.location.href = "/";
+                  });
+                }
+              }}
             >
               <Image
                 src="/arrow_down.svg"
                 width={26}
                 height={25}
-                alt="재생"
+                alt="삭제"
               ></Image>
             </button>
             <MediaPlayButton className="!bg-transparent  w-[81px] h-[81px] circle-btn-shadow-show rounded-full bg-white flex items-center justify-center">

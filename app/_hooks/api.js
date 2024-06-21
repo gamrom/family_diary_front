@@ -50,3 +50,31 @@ export const logout = () => {
 export function getCurrentUser() {
   return api.get("/current_user");
 }
+
+export function createDiary(data) {
+  return api.post("/diaries", data, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+}
+
+export function getDiaries() {
+  return api.get("/diaries");
+}
+
+export function getDiary(id) {
+  return api.get(`/diaries/${id}`);
+}
+
+export function updateDiary(id, data) {
+  return api.put(`/diaries/${id}`, data, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+}
+
+export function deleteDiary(id) {
+  return api.delete(`/diaries/${id}`);
+}

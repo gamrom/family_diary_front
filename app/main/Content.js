@@ -18,10 +18,23 @@ import {
 dayjs.locale("ko");
 import "./style.css";
 import { BottomFix } from "../_components/BottomFix";
+import { useRouter } from "next/navigation";
 
-export const Content = () => {
+export const Content = ({ diaries, initialDiary }) => {
+  const router = useRouter();
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [selectDay, setSelectDay] = useState(dayjs());
+
+  const [curretDiary, setCurrentDiary] = useState(initialDiary || null);
+
+  const checkDiary = (date) => {
+    return diaries.find((diary) => dayjs(diary.date).isSame(date, "day"));
+  };
+
+  useEffect(() => {
+    setCurrentDiary(checkDiary(selectDay));
+  }, [selectDay]);
+
   return (
     <div>
       <ClosePageNav>
@@ -44,7 +57,25 @@ export const Content = () => {
         onChange={(date) => {
           setSelectDay(dayjs(date));
         }}
+        tileContent={({ date, view }) => {
+          const diary = diaries.find((diary) =>
+            dayjs(diary.date).isSame(date, "day")
+          );
+          if (diary) {
+            return <div className="text-[10px] font-[400]">✅</div>;
+          }
+          return null;
+        }}
       />
+      {curretDiary && (
+        <button
+          onClick={() => {
+            router.push(`/show/${curretDiary.id}`);
+          }}
+        >
+          추억 재생하기
+        </button>
+      )}
       <div
         className="w-full rounded-[12px] bg-white  flex flex-col items-center justify-center py-[9px] px-[19px] mt-[27px]"
         style={{
@@ -82,7 +113,18 @@ export const Content = () => {
         </div>
       </div>
       <BottomFix>
-        <button type="button">
+        <button
+          type="button"
+          onClick={() => {
+            if (!!initialDiary) {
+              alert("이미 오늘의 일기를 작성하셨습니다.");
+            } else {
+              if (confirm("오늘 다이어리를 작성해보시겠어요?") === true) {
+                router.push("/recording/new");
+              }
+            }
+          }}
+        >
           <Image
             src="/circle_char.svg"
             className="circle-btn-shadow"

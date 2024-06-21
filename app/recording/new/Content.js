@@ -14,18 +14,25 @@ import { Loading } from "@/app/_components/Loading";
 import { recommendSentences } from "@/app/constants";
 import { RecordingComp } from "./RecordingComp";
 
+import { useRouter } from "next/navigation";
+
+import { createDiary } from "@/app/_hooks/api";
+
 export const Content = () => {
+  const router = useRouter();
   const audioRef = useRef(null);
   const [transcript, setTranscript] = useState("");
   const [recording, setRecording] = useState("ready");
   const [recordingTime, setRecordingTime] = useState("00:00");
   const [audioUrl, setAudioUrl] = useState(null); // New state to store the recorded audio URL
+
+  // 노종원 생성 -> 녹음용 blob
   const [audioBlobState, setAudioBlobState] = useState(null);
   const [recommendText, setRecommendText] = useState("");
 
   useEffect(() => {
     setRecommendText(
-      recommendSentences[Math.floor(Math.random() * recommendSentences.length)],
+      recommendSentences[Math.floor(Math.random() * recommendSentences.length)]
     );
   }, []);
 
@@ -35,6 +42,8 @@ export const Content = () => {
   const audioChunksRef = useRef([]);
   const mediaStreamRef = useRef(null);
   const [progress, setProgress] = useState(0);
+
+  // const [uploadedAudioUrl, setUploadedAudioUrl] = useState(null);
 
   const startRecording = async () => {
     setProgress(0);
@@ -124,7 +133,7 @@ export const Content = () => {
 
         audioRef.current?.addEventListener("timeupdate", () => {
           setProgress(
-            (audioRef.current.currentTime / audioRef.current.duration) * 100,
+            (audioRef.current.currentTime / audioRef.current.duration) * 100
           );
 
           //time
@@ -134,7 +143,7 @@ export const Content = () => {
           setRecordingTime(
             `${minutes < 10 ? `0${minutes}` : minutes}:${
               seconds < 10 ? `0${seconds}` : seconds
-            }`,
+            }`
           );
         });
 
@@ -145,43 +154,44 @@ export const Content = () => {
     }
   }, [isReplay]);
 
-  console.log(progress);
-
   const handleSubmit = () => {
+    setLoading(true);
+
+    uploadAudioToS3(audioBlobState).then((response) => {
+      const uploadedAudioUrl = response.data.Location;
+      console.log("uploadedAudioUrl", uploadedAudioUrl);
+      axios
+        .post("/api/transcripts", {
+          audio_url: uploadedAudioUrl,
+        })
+        .then((response) => {
+          const { text, audio_url } = response.data;
+          createDiary({
+            released_date: new Date(),
+            content: text,
+            audio_url: audio_url,
+          })
+            .then((res) => {
+              const { id } = res.data;
+              router.push(`/new/${id}`);
+            })
+            .finally(() => {
+              setLoading(false);
+            });
+        });
+    });
+
     console.log(transcript);
     console.log(audioUrl);
   };
 
-  //노종원의 원래 코드
-  // const uploadAudioToS3 = async (audioBlob) => {
-  //   try {
-  //     const formData = new FormData();
-  //     formData.append("audio", audioBlob, "recorded-audio.wav");
-
-  //     await axios.post("/api/upload-to-s3", formData);
-  //     console.log("Audio uploaded to S3 successfully");
-  //   } catch (error) {
-  //     console.error("Error uploading audio to S3:", error);
-  //   }
-  // };
-
   //로딩을 추가한 김은식의 코드
   const [isLoading, setLoading] = useState(false);
   const uploadAudioToS3 = (audioBlob) => {
-    setLoading(true);
     const formData = new FormData();
     formData.append("audio", audioBlob, "recorded-audio.wav");
-    axios
-      .post("/api/upload-to-s3", formData)
-      .then(() => {
-        console.log("Audio uploaded to S3 successfully");
-      })
-      .catch((error) => {
-        console.error("Error uploading audio to S3:", error);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+
+    return axios.post("/api/upload-to-s3", formData);
   };
 
   useEffect(() => {
@@ -194,7 +204,7 @@ export const Content = () => {
         setRecordingTime(
           `${minutes < 10 ? `0${minutes}` : minutes}:${
             seconds < 10 ? `0${seconds}` : seconds
-          }`,
+          }`
         );
       }, 1000);
       return () => clearInterval(interval);
@@ -209,14 +219,14 @@ export const Content = () => {
         <div className="flex flex-col items-center justify-center">
           <div className="font-[600] text-[30px] text-center">
             {recommendText}
-            <button
+            {/* <button
               onClick={() => {
                 console.log("upload");
                 uploadAudioToS3(audioBlobState);
               }}
             >
               업로드
-            </button>
+            </button> */}
           </div>
 
           {recording === "recording" ? (

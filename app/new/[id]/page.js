@@ -15,17 +15,9 @@ export default async function Page({ params }) {
   const { id } = params;
 
   const diary = await getDiary(id);
-
-  if (!diary) {
-    return (
-      <div>
-        등록된 일기가 존재하지 않습니다.
-        <button>
-          <a href="/">Home으로 돌아가기</a>
-        </button>
-      </div>
-    );
-  }
-
-  return <Content diary={diary} />;
+  return (
+    <div>
+      <Content diary={diary} />
+    </div>
+  );
 }
