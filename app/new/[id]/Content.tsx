@@ -81,8 +81,6 @@ export const Content = ({
       formData.append("image", imgRef.current.files[0]);
     }
 
-    formData.append("is_active", "true");
-
     updateDiary(diary?.id, formData).then((res: any) => {
       alert("오늘의 일기가 성공적으로 등록되었습니다.");
       router.push("/");
