@@ -38,11 +38,6 @@ export const Content = () => {
             <QR
               value={"https://pink1016.tistory.com/"}
               size={156}
-              imageSettings={{
-                src: "https://github.com/gamrom/gamrom/assets/18091593/eb2faa4e-6947-4817-ac5a-df4da38ba6d8",
-                width: 40,
-                height: 40,
-              }}
               id="qr-gen"
               level={"H"}
               includeMargin={false}
