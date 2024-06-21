@@ -18,7 +18,7 @@ export default async function Page({ params }) {
 
   if (!diary) {
     return (
-      <div>
+      <div className="main-container">
         등록된 일기가 존재하지 않습니다.
         <button>
           <a href="/">Home으로 돌아가기</a>
@@ -27,5 +27,9 @@ export default async function Page({ params }) {
     );
   }
 
-  return <Content diary={diary} />;
+  return (
+    <div className="main-container">
+      <Content diary={diary} />
+    </div>
+  );
 }

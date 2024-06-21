@@ -16,7 +16,7 @@ export default async function Page({ params }) {
 
   const diary = await getDiary(id);
   return (
-    <div>
+    <div className="main-container">
       <Content diary={diary} />
     </div>
   );
