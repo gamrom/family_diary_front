@@ -50,7 +50,7 @@ export default async function Home() {
     //   <a href="/recording/new">오늘 일기 작성하러 가기</a>
     // </div>
 
-    <div>
+    <div className="main-container">
       <Content diaries={diaries} initialDiary={initialDiary} />
     </div>
   );
