@@ -12,7 +12,7 @@ export default function KakaoButton() {
   const kakaoLoginClickHandler = () => {
     Kakao.Auth.authorize({
       redirectUri: kakaoRedirect,
-      scope: "account_email",
+      scope: "profile_image,account_email",
     });
   };
 
