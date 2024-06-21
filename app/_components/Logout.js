@@ -11,5 +11,13 @@ export const Logout = () => {
     });
   };
 
-  return <button onClick={handleLogout}>Logout</button>;
+  return (
+    <button
+      type="button"
+      className="bg-[#F5F5F5] text-[17px] font-[600] text-black w-full rounded-[30px] pt-[16px] pb-[15px] flex items-center justify-center"
+      onClick={handleLogout}
+    >
+      Sign out
+    </button>
+  );
 };

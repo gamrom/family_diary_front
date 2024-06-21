@@ -32,7 +32,7 @@ export const Content = () => {
 
   useEffect(() => {
     setRecommendText(
-      recommendSentences[Math.floor(Math.random() * recommendSentences.length)]
+      recommendSentences[Math.floor(Math.random() * recommendSentences.length)],
     );
   }, []);
 
@@ -133,7 +133,7 @@ export const Content = () => {
 
         audioRef.current?.addEventListener("timeupdate", () => {
           setProgress(
-            (audioRef.current.currentTime / audioRef.current.duration) * 100
+            (audioRef.current.currentTime / audioRef.current.duration) * 100,
           );
 
           //time
@@ -143,7 +143,7 @@ export const Content = () => {
           setRecordingTime(
             `${minutes < 10 ? `0${minutes}` : minutes}:${
               seconds < 10 ? `0${seconds}` : seconds
-            }`
+            }`,
           );
         });
 
@@ -195,6 +195,14 @@ export const Content = () => {
   };
 
   useEffect(() => {
+    if (recording === "ready") {
+      setRecordingTime("00:00");
+      //stop playing audio
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+    }
+
     if (recording === "recording") {
       let time = 0;
       const interval = setInterval(() => {
@@ -204,12 +212,14 @@ export const Content = () => {
         setRecordingTime(
           `${minutes < 10 ? `0${minutes}` : minutes}:${
             seconds < 10 ? `0${seconds}` : seconds
-          }`
+          }`,
         );
       }, 1000);
       return () => clearInterval(interval);
     }
   }, [recording]);
+
+  console.log(recommendText);
 
   return (
     <div className="flex flex-col justify-between min-h-screen">
@@ -217,17 +227,12 @@ export const Content = () => {
 
       <ScreenCenterLayout>
         <div className="flex flex-col items-center justify-center">
-          <div className="font-[600] text-[30px] text-center">
-            {recommendText}
-            {/* <button
-              onClick={() => {
-                console.log("upload");
-                uploadAudioToS3(audioBlobState);
-              }}
-            >
-              업로드
-            </button> */}
-          </div>
+          <div
+            className="font-[600] text-[30px] text-center"
+            dangerouslySetInnerHTML={{
+              __html: recommendText,
+            }}
+          ></div>
 
           {recording === "recording" ? (
             <RecordingComp />
@@ -247,7 +252,7 @@ export const Content = () => {
         {recording === "ready" && (
           <button
             type="button"
-            className="circle-btn-shadow"
+            // className="circle-btn-shadow"
             onClick={startRecording}
           >
             <Image src="/circle.svg" alt="준비" width={81} height={81} />

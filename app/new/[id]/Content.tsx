@@ -184,14 +184,14 @@ export const Content = ({
           <div className="flex space-x-[19px] w-full">
             <button
               type="button"
-              className="bg-[#F5F5F5] text-[17px] font-[600] text-black w-full rounded-[25px] pt-[16px] pb-[15px] flex items-center justify-center"
+              className="bg-[#F5F5F5] text-[17px] font-[600] text-black w-full rounded-[30px] pt-[16px] pb-[15px] flex items-center justify-center"
             >
               녹음하기
             </button>
             <button
               type="button"
               onClick={onSubmit}
-              className="bg-[#FF4D49] text-[17px] font-[600] text-white w-full rounded-[25px] pt-[16px] pb-[15px] flex items-center justify-center"
+              className="bg-[#FF4D49] text-[17px] font-[600] text-white w-full rounded-[30px] pt-[16px] pb-[15px] flex items-center justify-center"
             >
               완료하기
             </button>

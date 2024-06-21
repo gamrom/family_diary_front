@@ -45,13 +45,7 @@ export default async function Home() {
   const initialDiary = checkDiary(dayjs(), diaries);
 
   return (
-    // <div className="flex flex-col my-1">
-    //   <Logout />
-    //   <a href="/recording/new">오늘 일기 작성하러 가기</a>
-    // </div>
-
     <div className="main-container">
-      <Logout />
       <Content diaries={diaries} initialDiary={initialDiary} />
     </div>
   );
