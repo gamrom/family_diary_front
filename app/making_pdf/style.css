@@ -1,0 +1,22 @@
+@media print {
+  @page {
+    size: a4;
+  }
+}
+
+.pdf_wrapper {
+  background: url("/pdf_bg.svg") no-repeat;
+  background-size: contain;
+  width: 1000px;
+  height: 1414px;
+  padding: 68px 101px 80px 101px;
+}
+
+.pdf_date {
+  border: 5.9px solid rgba(38, 38, 38, 1);
+  width: fit-content;
+  border-radius: 40px;
+  padding: 15px 46px 11px 47px;
+  font-size: 28px;
+  font-weight: bold;
+}

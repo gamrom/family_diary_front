@@ -23,9 +23,7 @@ export default function RootLayout({
           src="https://cdn.jsdelivr.net/npm/media-chrome@3/+esm"
         ></Script>
       </head>
-      <body
-        className={`max-w-[400px] mx-auto ${inter.className} font-inter px-[34px]`}
-      >
+      <body className={`${inter.className}`}>
         <Providers>{children}</Providers>
       </body>
     </html>

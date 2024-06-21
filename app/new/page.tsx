@@ -2,7 +2,7 @@ import { Content } from "./Content";
 
 export default function Page() {
   return (
-    <div>
+    <div className="main-container">
       <Content />
     </div>
   );
