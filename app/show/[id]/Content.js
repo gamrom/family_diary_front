@@ -105,8 +105,6 @@ export const Content = () => {
         </div>
       </div>
 
-      <PdfTemplate />
-
       {!audioLoading && (
         <MediaController
           audio

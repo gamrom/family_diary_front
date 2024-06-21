@@ -1,8 +1,8 @@
 import { Content } from "./Content";
 
-export default function RecodePage() {
+export default function Page() {
   return (
-    <div className="main-container">
+    <div>
       <Content />
     </div>
   );
