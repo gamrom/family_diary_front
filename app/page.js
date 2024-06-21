@@ -44,14 +44,11 @@ export default async function Home() {
 
   const initialDiary = checkDiary(dayjs(), diaries);
 
-  return (
-    // <div className="flex flex-col my-1">
-    //   <Logout />
-    //   <a href="/recording/new">오늘 일기 작성하러 가기</a>
-    // </div>
+  console.log("user", user);
 
+  return (
     <div className="main-container">
-      <Content diaries={diaries} initialDiary={initialDiary} />
+      <Content diaries={diaries} initialDiary={initialDiary} user={user} />
     </div>
   );
 }

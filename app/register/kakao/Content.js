@@ -1,8 +1,9 @@
 "use client";
 
-import React, { Suspense } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
+import { LoadingFallback } from "@/app/_components/LoadingFallback";
 
 import { postKakaoAuth } from "@/app/_hooks/api";
 
@@ -11,6 +12,7 @@ const KakaoLoginContent = () => {
   const searchParams = useSearchParams();
   const code = searchParams.get("code");
 
+  // if (typeof window !== "undefined") {
   postKakaoAuth({
     code,
     redirect_uri: `${window?.location?.origin}/register/kakao`,
@@ -24,17 +26,14 @@ const KakaoLoginContent = () => {
       console.log(error);
       alert("카카오 로그인에 실패했습니다.");
     });
+  // }
 
-  return (
-    <div className="flex items-center justify-center w-full h-screen">
-      <div className="text-2xl">카카오 로그인 중...</div>
-    </div>
-  );
+  return <LoadingFallback />;
 };
 
 export const Content = () => {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<LoadingFallback />}>
       <KakaoLoginContent />
     </Suspense>
   );

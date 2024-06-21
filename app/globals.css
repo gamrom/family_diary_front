@@ -30,11 +30,11 @@
 }
 
 .react-calendar__month-view__days__day:nth-child(7n + 1) {
-  color: #4141f6;
+  color: #f84440;
 }
 
 .react-calendar__month-view__days__day:nth-child(7n) {
-  color: #f84440;
+  color: #4141f6;
 }
 
 .react-calendar__month-view__days__day--neighboringMonth {
@@ -129,4 +129,16 @@
   box-shadow:
     3px 5px 10px rgba(0, 0, 0, 0.2),
     -3px -8px 8px rgba(255, 255, 255, 0.12);
+}
+
+.home-main-calendar > .react-calendar__navigation {
+  display: none;
+}
+
+.react-calendar__tile {
+  aspect-ratio: 1/1;
+}
+
+.bottom_main-content {
+  box-shadow: 0px 4px 20px 1px rgba(0, 0, 0, 0.1);
 }
