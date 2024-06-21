@@ -2,6 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+.main-container {
+  max-width: 400px;
+  margin: auto;
+  font-family: "Inter", sans-serif;
+  padding: 0 34px;
+}
+
 .react-calendar__navigation__label {
   font-size: 20px;
   font-weight: 600;

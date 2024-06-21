@@ -32,7 +32,8 @@
     "app/api/transcripts/route.js",
     "app/recording/new/Content.tsxx",
     "app/recording/new/Content.js",
-    "app/main/Content.js"
+    "app/main/Content.js",
+    "app/making_pdf/Content.js"
   ],
   "exclude": ["node_modules"]
 }

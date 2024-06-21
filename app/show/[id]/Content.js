@@ -17,6 +17,9 @@ import {
   ModalFooter,
   useDisclosure,
 } from "@nextui-org/modal";
+import { PdfTemplate } from "./PdfTemplate";
+
+import { PDFDownloadLink, usePDF } from "@react-pdf/renderer";
 
 import {
   MediaController,
@@ -32,13 +35,17 @@ import { deleteDiary } from "@/app/_hooks/api";
 export const Content = ({ diary }) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [progress, setProgress] = useState(0);
+  const pdfBtnRef = useRef();
+  const [instance, updateInstance] = usePDF({ document: <PdfTemplate /> });
+
+  const [isLoading, setIsLoading] = useState(false);
 
   // when play, calculate progress -> current time / total duration * 100
   const audioRef = useRef();
 
-  const [isLoading, setIsLoading] = useState(false);
   const onSubmit = () => {
     setIsLoading(true);
+    pdfBtnRef.current.click();
   };
 
   //calculate progress when audio is playing after click MediaPlayButton
@@ -92,6 +99,13 @@ export const Content = ({ diary }) => {
         </BackBtn>
       </div>
 
+      <a
+        ref={pdfBtnRef}
+        href={instance.url}
+        className="hidden"
+        download="test.pdf"
+      ></a>
+
       <div className="text-white px-4 text-center h-[140px] overflow-auto show-text mt-[44px] relative">
         <div dangerouslySetInnerHTML={{ __html: diary?.content }}></div>
       </div>
@@ -139,9 +153,7 @@ export const Content = ({ diary }) => {
           </div>
         </MediaController>
       )}
-
       <div className="show-bg"></div>
-
       <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
         <ModalContent className="max-w-[328px] h-[60vh] p-[30px]">
           {(onClose) => (
