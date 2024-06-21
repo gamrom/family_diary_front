@@ -3,6 +3,14 @@ import { usePDF } from "react-to-pdf";
 import QR from "qrcode.react";
 import Image from "next/image";
 import { useState, useEffect } from "react";
+import {
+  Document,
+  Page,
+  Text,
+  View,
+  StyleSheet,
+  ReactPdf,
+} from "@react-pdf/renderer";
 import "./style.css";
 
 export const Content = () => {
@@ -26,6 +34,7 @@ export const Content = () => {
             <div className="pdf_date flex item-center justify-center text-center">
               24.06.27
             </div>
+
             <QR
               value={"https://pink1016.tistory.com/"}
               size={156}
@@ -60,12 +69,12 @@ export const Content = () => {
         </div>
 
         <div className="mt-[74px]">
-          <div className="text-[40px] font-bold">
+          <Text className="text-[40px] font-bold">
             lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed Lorem,
             ipsum dolor sit amet consectetur adipisicing elit. Quod temporibus
             quas sint tempora voluptatibus voluptates, quae tempore numquam
             placeat, laborum soluta! Numquam cumque, magnam vero eius quasi
-          </div>
+          </Text>
         </div>
 
         <button onClick={() => toPDF()}>PDF다운로드 버튼(없어질예정)</button>
