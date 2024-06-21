@@ -27,7 +27,5 @@ export default async function Page({ params }) {
     );
   }
 
-  console.log(diary);
-
   return <Content diary={diary} />;
 }

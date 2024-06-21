@@ -52,7 +52,11 @@ export function getCurrentUser() {
 }
 
 export function createDiary(data) {
-  return api.post("/diaries", data);
+  return api.post("/diaries", data, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
 }
 
 export function getDiaries() {
@@ -64,7 +68,11 @@ export function getDiary(id) {
 }
 
 export function updateDiary(id, data) {
-  return api.put(`/diaries/${id}`, data);
+  return api.put(`/diaries/${id}`, data, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
 }
 
 export function deleteDiary(id) {

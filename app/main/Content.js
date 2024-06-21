@@ -116,7 +116,13 @@ export const Content = ({ diaries, initialDiary }) => {
         <button
           type="button"
           onClick={() => {
-            router.push("/recording/new");
+            if (!!initialDiary) {
+              alert("이미 오늘의 일기를 작성하셨습니다.");
+            } else {
+              if (confirm("오늘 다이어리를 작성해보시겠어요?") === true) {
+                router.push("/recording/new");
+              }
+            }
           }}
         >
           <Image

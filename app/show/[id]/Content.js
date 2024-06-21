@@ -27,6 +27,8 @@ import {
 import { LoadingTransform } from "./LoadingTransform";
 import { BackBtn } from "@/app/_components/BackBtn";
 
+import { deleteDiary } from "@/app/_hooks/api";
+
 export const Content = ({ diary }) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [progress, setProgress] = useState(0);
@@ -107,13 +109,21 @@ export const Content = ({ diary }) => {
           <div className="flex mt-[30px] items-center justify-between">
             <button
               type="button"
-              className="!bg-transparent  w-[81px] h-[81px] circle-btn-shadow-show rounded-full bg-white flex items-center justify-center"
+              className="!bg-transparent w-[81px] h-[81px] circle-btn-shadow-show rounded-full bg-white flex items-center justify-center"
+              onClick={() => {
+                if (confirm("정말 삭제하시겠습니까?")) {
+                  deleteDiary(diary.id).then(() => {
+                    alert("삭제되었습니다.");
+                    window.location.href = "/";
+                  });
+                }
+              }}
             >
               <Image
                 src="/arrow_down.svg"
                 width={26}
                 height={25}
-                alt="재생"
+                alt="삭제"
               ></Image>
             </button>
             <MediaPlayButton className="!bg-transparent  w-[81px] h-[81px] circle-btn-shadow-show rounded-full bg-white flex items-center justify-center">
