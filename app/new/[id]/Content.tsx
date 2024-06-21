@@ -1,6 +1,6 @@
 "use client";
 
-import { ClosePageNav } from "../_components/ClosePageNav";
+import { ClosePageNav } from "@/app/_components/ClosePageNav";
 import dayjs, { Dayjs } from "dayjs";
 import "dayjs/locale/ko";
 import {
@@ -13,19 +13,33 @@ import {
 } from "@nextui-org/modal";
 import Calendar from "react-calendar";
 import { useRef, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 import "react-calendar/dist/Calendar.css";
 
 import Image from "next/image";
-import { BottomFix } from "../_components/BottomFix";
+import { BottomFix } from "@/app/_components/BottomFix";
 dayjs.locale("ko");
 
-export const Content = () => {
+import { updateDiary } from "@/app/_hooks/api";
+
+export const Content = ({
+  diary,
+}: {
+  diary: {
+    id: number;
+    released_date: string;
+    content: string;
+    image_url: string;
+    audio_url: string;
+  };
+}) => {
+  const router = useRouter();
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   const [sendParams, setSendParams] = useState({
-    date: dayjs().format("YYYY-MM-DD"),
-    content: "",
+    date: dayjs(diary?.released_date?.replace(/-/g, "/")).format("YYYY-MM-DD"),
+    content: diary?.content || "",
     image: "",
   });
   const imgRef = useRef<HTMLInputElement>(null);
@@ -60,7 +74,19 @@ export const Content = () => {
   }, [imgRef]);
 
   const onSubmit = () => {
-    console.log(sendParams);
+    const formData = new FormData();
+
+    formData.append("content", sendParams.content);
+    if (imgRef.current?.files?.[0]) {
+      formData.append("image", imgRef.current.files[0]);
+    }
+
+    formData.append("is_active", "true");
+
+    updateDiary(diary?.id, formData).then((res: any) => {
+      alert("오늘의 일기가 성공적으로 등록되었습니다.");
+      router.push("/");
+    });
   };
 
   return (
