@@ -24,7 +24,7 @@ import { ProfileBtn } from "../_components/ProfileBtn";
 import Link from "next/link";
 import { LoadingFallback } from "../_components/LoadingFallback";
 
-export const Content = ({ diaries, initialDiary }) => {
+export const Content = ({ diaries, initialDiary, user }) => {
   const router = useRouter();
 
   //calendar
@@ -63,7 +63,7 @@ export const Content = ({ diaries, initialDiary }) => {
     <Suspense fallback={<LoadingFallback />}>
       <ClosePageNav>
         <div className="invisible">
-          <ProfileBtn />
+          <ProfileBtn profile_url={user?.profile_url} />
         </div>
         <button
           onClick={onOpen}

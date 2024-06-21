@@ -5,7 +5,7 @@ export const ProfileBtn = ({ profile_url }: { profile_url: string }) => {
   return profile_url ? (
     <Link href="/mypage" className="w-[33px] h-[33px] profile">
       <Image
-        src="/profile_default.png"
+        src={profile_url}
         width={33}
         height={33}
         alt="프로필"

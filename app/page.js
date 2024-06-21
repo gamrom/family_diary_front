@@ -44,9 +44,11 @@ export default async function Home() {
 
   const initialDiary = checkDiary(dayjs(), diaries);
 
+  console.log("user", user);
+
   return (
     <div className="main-container">
-      <Content diaries={diaries} initialDiary={initialDiary} />
+      <Content diaries={diaries} initialDiary={initialDiary} user={user} />
     </div>
   );
 }
