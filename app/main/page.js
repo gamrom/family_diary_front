@@ -1,9 +1,8 @@
-import { Content } from "./Content";
+// 종원 : 여기 지워야 함..
 
 export default function Page() {
   return (
     <div>
-      <Content />
     </div>
   );
 }
