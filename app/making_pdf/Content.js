@@ -64,12 +64,12 @@ export const Content = () => {
         </div>
 
         <div className="mt-[74px]">
-          <Text className="text-[40px] font-bold">
+          <div className="text-[40px] font-bold">
             lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed Lorem,
             ipsum dolor sit amet consectetur adipisicing elit. Quod temporibus
             quas sint tempora voluptatibus voluptates, quae tempore numquam
             placeat, laborum soluta! Numquam cumque, magnam vero eius quasi
-          </Text>
+          </div>
         </div>
 
         <button onClick={() => toPDF()}>PDF다운로드 버튼(없어질예정)</button>
