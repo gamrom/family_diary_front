@@ -51,6 +51,7 @@ export default async function Home() {
     // </div>
 
     <div className="main-container">
+      <Logout />
       <Content diaries={diaries} initialDiary={initialDiary} />
     </div>
   );
