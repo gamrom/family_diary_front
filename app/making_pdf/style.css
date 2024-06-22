@@ -5,8 +5,8 @@
 }
 
 .pdf_wrapper {
-  background: url("/pdf_bg.svg") no-repeat;
-  background-size: contain;
+  /* background: url("/pdf_bg.svg") no-repeat;
+  background-size: contain; */
   width: 1000px;
   height: 1414px;
   padding: 68px 101px 80px 101px;
@@ -17,7 +17,6 @@
   width: fit-content;
   border-radius: 40px;
   padding: 15px 46px 11px 47px;
-  /* padding: 9px 46px 11px 47px; */
   font-size: 28px;
   font-weight: bold;
 }

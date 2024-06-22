@@ -3,32 +3,19 @@ import { usePDF } from "react-to-pdf";
 import QR from "qrcode.react";
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import {
-  Document,
-  Page,
-  Text,
-  View,
-  StyleSheet,
-  ReactPdf,
-} from "@react-pdf/renderer";
 import "./style.css";
 
 export const Content = () => {
-  const { toPDF, targetRef } = usePDF({
-    filename: "sample.pdf",
-    size: "letter",
-  });
-
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    setIsLoading(false);
-  }, []);
-
-  if (isLoading) return <div></div>;
   return (
-    <div ref={targetRef}>
+    <div>
       <div className="pdf_wrapper">
+        <Image
+          src="/pdf_bg.svg"
+          alt="PDF Background"
+          width={1000}
+          height={1414}
+          className="absolute top-0 left-0 z-[-1]"
+        />
         <div className="flex">
           <div className="flex flex-col justify-between pt-[32px] pb-[28px]">
             <div className="pdf_date flex item-center justify-center text-center">
@@ -71,8 +58,6 @@ export const Content = () => {
             placeat, laborum soluta! Numquam cumque, magnam vero eius quasi
           </div>
         </div>
-
-        <button onClick={() => toPDF()}>PDF다운로드 버튼(없어질예정)</button>
       </div>
     </div>
   );
