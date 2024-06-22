@@ -13,13 +13,14 @@ export default function Home() {
     try {
       const response = await fetch(`/api/make-pdf?url=${encodeURIComponent(url)}`);
 
-      if (response.ok) {
-        const pdfBlob = await response.blob();
-        setPdfUrl(URL.createObjectURL(pdfBlob));
-      } else {
+      if (!response.ok) {
         const error = await response.json();
         console.error(error.error);
       }
+
+      const data = await response.json();
+      console.log(data);
+      setPdfUrl(data.Location);
     } catch (error) {
       console.error("Error fetching PDF:", error);
     }
