@@ -1,4 +1,4 @@
-// import { Content } from "./Content";
+import { Content } from "./Content";
 import { fetcher } from "@/app/_hooks/fetcher";
 import { cookies } from "next/headers";
 
@@ -15,5 +15,5 @@ export default async function Page({ params }) {
   const { id } = params;
 
   const diary = await getDiary(id);
-  // return <Content diary={diary} />;
+  return <Content diary={diary} />;
 }
