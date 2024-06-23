@@ -119,7 +119,6 @@ export const Content = ({
 
         updateDiary(id, formData2)
           .then((res: any) => {
-            alert("오늘의 일기가 성공적으로 등록되었습니다.");
             router.push(`/show/${id}`);
           })
           .catch(() => {
@@ -129,9 +128,6 @@ export const Content = ({
             setLoading(false);
           });
       }
-
-      // alert("오늘의 일기가 성공적으로 등록되었습니다.");
-      // router.push("/");
 
       setLoading(false);
     });

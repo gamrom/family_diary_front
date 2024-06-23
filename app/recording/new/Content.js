@@ -142,6 +142,7 @@ export const Content = ({ date }) => {
   };
 
   const handleSubmit = () => {
+    setLoading(true);
     uploadAudioToS3(audioBlobState).then((response) => {
       const uploadedAudioUrl = response.data.Location;
       console.log("uploadedAudioUrl", uploadedAudioUrl);

@@ -24,7 +24,7 @@ export const Content = ({ diary }) => {
   const [progress, setProgress] = useState(0);
   const pdfBtnRef = useRef();
   const [isPlaying, setIsPlaying] = useState(false);
-
+  const [audioTime, setAudioTime] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
 
   // when play, calculate progress -> current time / total duration * 100
@@ -42,6 +42,7 @@ export const Content = ({ diary }) => {
       const onTimeUpdate = () => {
         const progress = (audio.currentTime / audio.duration) * 100;
         setProgress(progress);
+        setAudioTime(audio.currentTime);
       };
       audio.addEventListener("timeupdate", onTimeUpdate);
 
@@ -90,18 +91,9 @@ export const Content = ({ diary }) => {
         </Link>
       </div>
 
-      {diary?.content ? (
-        <div className="text-white px-4 text-center h-[140px] overflow-auto show-text mt-[44px] relative">
-          <div dangerouslySetInnerHTML={{ __html: diary.content }}></div>
-        </div>
-      ) : (
-        <div className="text-white px-4 text-center h-[140px] overflow-auto show-text mt-[44px] relative">
-          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Laborum sed
-          saepe aliquid sapiente ut consequuntur, maxime impedit aperiam esse
-          culpa corrupti ipsam vitae nulla voluptates quia laboriosam. Minus,
-          quibusdam quis?
-        </div>
-      )}
+      <div className="text-white px-4 text-center h-[140px] overflow-auto show-text mt-[44px] relative">
+        <div dangerouslySetInnerHTML={{ __html: diary.content }}></div>
+      </div>
 
       <div className="show-bg"></div>
 
@@ -111,7 +103,10 @@ export const Content = ({ diary }) => {
 
           <div className="flex items-center justify-center gap-4">
             <ProgressComp percent={progress} />
-            {/* <MediaTimeDisplay className="bg-transparent"></MediaTimeDisplay> */}
+
+            <div className="bg-transparent text-white text-[14px] font-[500] opacity-30">
+              {dayjs().startOf("day").second(audioTime).format("mm:ss")}
+            </div>
           </div>
           <div className="flex mt-[30px] items-center justify-between gap-[25px]">
             <button
@@ -128,30 +123,39 @@ export const Content = ({ diary }) => {
             >
               <Image src="/trash.svg" width={27} height={27} alt="삭제"></Image>
             </button>
-            <button
-              type="button"
-              onClick={() => {
-                audioRef.current.play();
-                setIsPlaying(true);
-              }}
-              className="bg-transparent w-[81px] h-[81px] circle-btn-shadow-show rounded-full  flex items-center justify-center"
-            >
-              {isPlaying ? (
+            {isPlaying ? (
+              <button
+                type="button"
+                onClick={() => {
+                  audioRef.current.pause();
+                  setIsPlaying(false);
+                }}
+                className="bg-transparent w-[81px] h-[81px] circle-btn-shadow-show rounded-full  flex items-center justify-center"
+              >
                 <Image
                   src="/pause_white.svg"
                   width={25}
                   height={28}
-                  alt="재생"
+                  alt="일시정지"
                 ></Image>
-              ) : (
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  audioRef.current.play();
+                  setIsPlaying(true);
+                }}
+                className="bg-transparent w-[81px] h-[81px] circle-btn-shadow-show rounded-full  flex items-center justify-center"
+              >
                 <Image
                   src="/play_white.svg"
                   width={36}
                   height={36}
                   alt="재생"
                 ></Image>
-              )}
-            </button>
+              </button>
+            )}
 
             <button
               type="button"
