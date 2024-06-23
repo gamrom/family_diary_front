@@ -135,7 +135,7 @@ export const Content = ({
   };
 
   return (
-    <div className="h-screen flex justify-between flex-col">
+    <div className="flex flex-col justify-between h-screen">
       <ClosePageNav>
         <div className="flex items-center justify-between w-full">
           <Image
@@ -154,8 +154,17 @@ export const Content = ({
         </div>
       </ClosePageNav>
       <div className="flex flex-col mt-4 mb-auto">
+        {/* <div
+          className="w-full px-[19px] pt-[26px] pb-[29px] flex flex-col rounded-[12px]"
+          style={{
+            boxShadow: "0px 4px 20px 1px #0000001A",
+          }}
+        >
+          <div className="font-[600] text-xs">일기 듣기</div>
+        </div> */}
+
         <div
-          className="w-full px-[19px] pt-[26px] pb-[12px] flex flex-col rounded-[12px]"
+          className="w-full px-[19px] pt-[26px] pb-[12px] flex flex-col rounded-[12px] mt-[25px]"
           style={{
             boxShadow: "0px 4px 20px 1px #0000001A",
           }}
