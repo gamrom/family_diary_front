@@ -49,7 +49,7 @@ const KakaoLoginContent = () => {
       </button>
       <div className="flex flex-col h-[150px] w-[200px] justify-between items-center">
         <div className="loading-spinner loading-spinner-size_change"></div>
-        <div className="font-[700] text-white">LOADING..</div>
+        <div className="font-[700] text-white">로그인 정보 확인중..</div>
       </div>
     </div>
   );
@@ -81,7 +81,7 @@ export const Content = () => {
           </button>
           <div className="flex flex-col h-[150px] w-[200px] justify-between items-center">
             <div className="loading-spinner loading-spinner-size_change"></div>
-            <div className="font-[700] text-white">LOADING..</div>
+            <div className="font-[700] text-white">로그인 정보 확인중..</div>
           </div>
         </div>
       }

@@ -33,7 +33,7 @@ export const Content = ({ date }) => {
 
   useEffect(() => {
     setRecommendText(
-      recommendSentences[Math.floor(Math.random() * recommendSentences.length)]
+      recommendSentences[Math.floor(Math.random() * recommendSentences.length)],
     );
   }, []);
 
@@ -117,7 +117,7 @@ export const Content = ({ date }) => {
 
         audioRef.current?.addEventListener("timeupdate", () => {
           setProgress(
-            (audioRef.current.currentTime / audioRef.current.duration) * 100
+            (audioRef.current.currentTime / audioRef.current.duration) * 100,
           );
 
           setRecordingTime(formatTime(audioRef.current.currentTime));
@@ -180,7 +180,7 @@ export const Content = ({ date }) => {
         setRecordingTime(
           `${minutes < 10 ? `0${minutes}` : minutes}:${
             seconds < 10 ? `0${seconds}` : seconds
-          }`
+          }`,
         );
       }, 1000);
       return () => clearInterval(interval);
@@ -260,7 +260,9 @@ export const Content = ({ date }) => {
         )}
       </BottomFix>
       {audioUrl && <audio ref={audioRef} src={audioUrl} hidden />}
-      {isLoading && <Loading isLoading={isLoading} />}
+      {isLoading && (
+        <Loading isLoading={isLoading} text="오디오파일 업로드 중.." />
+      )}
     </div>
   );
 };

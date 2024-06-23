@@ -112,8 +112,11 @@ export const Content = ({
 
   console.log(sendParams.content.length);
 
+  const [loadingText, setLoadingText] = useState("Loading..");
+
   const onSubmit = () => {
     setLoading(true);
+    setLoadingText("일기 생성 요청 중..");
     const formData = new FormData();
 
     if (sendParams.content.length === 0) {
@@ -142,6 +145,8 @@ export const Content = ({
     updateDiary(diary?.id, formData).then(async (res: any) => {
       const { id } = res.data;
 
+      setLoadingText("책이 될 페이지 생성 중..");
+
       const response = await fetch(
         `/api/make-pdf?url=${process.env.NEXT_PUBLIC_ORIGIN}/making_pdf/${id}`
       );
@@ -154,6 +159,8 @@ export const Content = ({
 
         const formData2 = new FormData();
         formData2.append("pdf_url", data.Location);
+
+        setLoadingText("일기 생성 중..");
 
         updateDiary(id, formData2)
           .then((res: any) => {
@@ -227,7 +234,7 @@ export const Content = ({
                   Math.floor(audioTime % 60)
                     .toString()
                     .padStart(2, "0")
-                } / ${audioLength}`}
+                }`}
               </div>
             </div>
           ) : (
@@ -260,7 +267,7 @@ export const Content = ({
                 {" / "}
                 {audioRef.current && audioRef.current.duration} */}
 
-                {`00:00 / ${audioLength}`}
+                {`00:00`}
               </div>
             </div>
           )}
@@ -398,7 +405,7 @@ export const Content = ({
           )}
         </ModalContent>
       </Modal>
-      {isLoading && <Loading isLoading={isLoading} />}
+      {isLoading && <Loading isLoading={isLoading} text={loadingText} />}
     </div>
   );
 };
