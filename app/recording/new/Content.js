@@ -132,7 +132,7 @@ export const Content = () => {
       formData.append("audio", audioBlobState, "recorded-audio.wav");
       await axios.post("/api/upload-to-s3", formData);
       setLoading(false);
-      window.location.href = "/new";
+      // window.location.href = "/new";
     } catch (error) {
       alert("오디오 업로드에 실패했습니다. 새로고침 후 다시 시도해주세요.");
       setLoading(false);

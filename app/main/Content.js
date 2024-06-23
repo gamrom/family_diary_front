@@ -150,7 +150,7 @@ export const Content = ({ diaries, initialDiary, user }) => {
 
             <div className="flex items-start mt-[17px]">
               <Image
-                src="/image_sample.png"
+                src="/image_sample.jpeg"
                 className="object-contain rounded-lg"
                 width={111}
                 height={111}

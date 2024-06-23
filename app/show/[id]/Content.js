@@ -63,9 +63,6 @@ export const Content = ({ diary }) => {
     }
   }, [audioRef.current]);
 
-  console.log(progress);
-  console.log(diary?.audio_url);
-
   const [audioLoading, setAudioLoading] = useState(true);
   useEffect(() => {
     setAudioLoading(false);
@@ -75,7 +72,7 @@ export const Content = ({ diary }) => {
     <div className="flex flex-col items-center">
       <div className="mt-[20px] relative">
         <Image
-          src={diary?.image_url || "/image_sample.png"}
+          src={diary?.image_url || "/image_sample.jpeg"}
           width={354}
           height={354}
           className="object-fit w-full rounded-[30px]"
@@ -106,54 +103,77 @@ export const Content = ({ diary }) => {
         download="test.pdf"
       ></a>
 
-      <div className="text-white px-4 text-center h-[140px] overflow-auto show-text mt-[44px] relative">
-        <div dangerouslySetInnerHTML={{ __html: diary?.content }}></div>
+      {diary?.content ? (
+        <div className="text-white px-4 text-center h-[140px] overflow-auto show-text mt-[44px] relative">
+          <div dangerouslySetInnerHTML={{ __html: diary.content }}></div>
+        </div>
+      ) : (
+        <div className="text-white px-4 text-center h-[140px] overflow-auto show-text mt-[44px] relative">
+          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Laborum sed
+          saepe aliquid sapiente ut consequuntur, maxime impedit aperiam esse
+          culpa corrupti ipsam vitae nulla voluptates quia laboriosam. Minus,
+          quibusdam quis?
+        </div>
+      )}
+
+      <div className="show-bg"></div>
+
+      <div className="fixed bottom-0 pb-[57px]">
+        {!audioLoading && (
+          <MediaController
+            audio
+            className="bg-transparent mt-[31px] w-full flex-col items-center justify-center"
+          >
+            <audio ref={audioRef} slot="media" src={diary?.audio_url}></audio>
+            <div className="flex items-center justify-center gap-4">
+              <ProgressComp percent={progress} />
+              <MediaTimeDisplay className="bg-transparent"></MediaTimeDisplay>
+            </div>
+            <div className="flex mt-[30px] items-center justify-between">
+              <button
+                type="button"
+                className="!bg-transparent w-[81px] h-[81px] circle-btn-shadow-show rounded-full bg-white flex items-center justify-center"
+                onClick={() => {
+                  if (confirm("정말 삭제하시겠습니까?")) {
+                    deleteDiary(diary.id).then(() => {
+                      alert("삭제되었습니다.");
+                      window.location.href = "/";
+                    });
+                  }
+                }}
+              >
+                <Image
+                  src="/arrow_down.svg"
+                  width={26}
+                  height={25}
+                  alt="삭제"
+                ></Image>
+              </button>
+              <MediaPlayButton className="!bg-transparent  w-[81px] h-[81px] circle-btn-shadow-show rounded-full bg-white flex items-center justify-center">
+                <Image
+                  src="/play.svg"
+                  width={36}
+                  height={36}
+                  alt="재생"
+                ></Image>
+              </MediaPlayButton>
+              <button
+                type="button"
+                onClick={onOpen}
+                className="!bg-transparent  w-[81px] h-[81px] circle-btn-shadow-show rounded-full bg-white flex items-center justify-center"
+              >
+                <Image
+                  src="/print.svg"
+                  width={32}
+                  height={28}
+                  alt="재생"
+                ></Image>
+              </button>
+            </div>
+          </MediaController>
+        )}
       </div>
 
-      {!audioLoading && (
-        <MediaController
-          audio
-          className="bg-transparent mt-[31px] w-full flex-col items-center justify-center"
-        >
-          <audio ref={audioRef} slot="media" src={diary?.audio_url}></audio>
-          <div className="flex items-center justify-center gap-4">
-            <ProgressComp percent={progress} />
-            <MediaTimeDisplay className="bg-transparent"></MediaTimeDisplay>
-          </div>
-          <div className="flex mt-[30px] items-center justify-between">
-            <button
-              type="button"
-              className="!bg-transparent w-[81px] h-[81px] circle-btn-shadow-show rounded-full bg-white flex items-center justify-center"
-              onClick={() => {
-                if (confirm("정말 삭제하시겠습니까?")) {
-                  deleteDiary(diary.id).then(() => {
-                    alert("삭제되었습니다.");
-                    window.location.href = "/";
-                  });
-                }
-              }}
-            >
-              <Image
-                src="/arrow_down.svg"
-                width={26}
-                height={25}
-                alt="삭제"
-              ></Image>
-            </button>
-            <MediaPlayButton className="!bg-transparent  w-[81px] h-[81px] circle-btn-shadow-show rounded-full bg-white flex items-center justify-center">
-              <Image src="/play.svg" width={36} height={36} alt="재생"></Image>
-            </MediaPlayButton>
-            <button
-              type="button"
-              onClick={onOpen}
-              className="!bg-transparent  w-[81px] h-[81px] circle-btn-shadow-show rounded-full bg-white flex items-center justify-center"
-            >
-              <Image src="/print.svg" width={32} height={28} alt="재생"></Image>
-            </button>
-          </div>
-        </MediaController>
-      )}
-      <div className="show-bg"></div>
       <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
         <ModalContent className="max-w-[328px] h-[60vh] p-[30px]">
           {(onClose) => (
