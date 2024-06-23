@@ -121,14 +121,14 @@ export const Content = ({ diaries, user }) => {
       />
       {!isLoading && pickDiary ? (
         <Link
-          href={`/show/${pickDiary.id}}`}
+          href={`/show/${pickDiary.id}`}
           className="w-full flex flex-col bottom_main-content mt-[44px] py-[17px] px-[19px] rounded-[12px]"
         >
           <div className="text-[15px] text-[#89898B] font-[600]">
             {dayjs(selectDay).format("D일 ddd요일")}
           </div>
 
-          <div className="flex mt-[14px] gap-[11px] flex">
+          <div className="mt-[14px] gap-[11px] flex">
             <Image
               width={148}
               height={148}
