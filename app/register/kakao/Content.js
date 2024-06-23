@@ -12,7 +12,6 @@ const KakaoLoginContent = () => {
   const searchParams = useSearchParams();
   const code = searchParams.get("code");
 
-  // if (typeof window !== "undefined") {
   postKakaoAuth({
     code,
     redirect_uri: `${window?.location?.origin}/register/kakao`,
@@ -26,9 +25,6 @@ const KakaoLoginContent = () => {
       console.log(error);
       alert("카카오 로그인에 실패했습니다.");
     });
-  // }
-
-  return <LoadingFallback />;
 };
 
 export const Content = () => {

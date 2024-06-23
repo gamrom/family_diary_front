@@ -14,6 +14,7 @@ import {
 import Calendar from "react-calendar";
 import { useRef, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Loading } from "@/app/_components/Loading";
 
 import "react-calendar/dist/Calendar.css";
 
@@ -43,6 +44,7 @@ export const Content = ({
     image: "",
   });
   const imgRef = useRef<HTMLInputElement>(null);
+  const [isLoading, setLoading] = useState(false);
   const addImage = () => {
     imgRef.current?.click();
   };
@@ -76,6 +78,7 @@ export const Content = ({
   console.log(sendParams.content.length);
 
   const onSubmit = () => {
+    setLoading(true);
     const formData = new FormData();
 
     if (sendParams.content.length === 0) {
@@ -98,9 +101,37 @@ export const Content = ({
       formData.append("image", imgRef.current.files[0]);
     }
 
-    updateDiary(diary?.id, formData).then((res: any) => {
-      alert("오늘의 일기가 성공적으로 등록되었습니다.");
-      router.push("/");
+    updateDiary(diary?.id, formData).then(async (res: any) => {
+      const { id } = res.data;
+
+      const response = await fetch(
+        `/api/make-pdf?url=${process.env.NEXT_PUBLIC_ORIGIN}/making_pdf/${id}`
+      );
+
+      if (!response.ok) {
+        alert("데이터 생성에 실패했습니다. 다시 시도해주세요.");
+        return;
+      } else {
+        const data = await response.json();
+
+        const formData2 = new FormData();
+        formData2.append("pdf_url", data.Location);
+
+        updateDiary(id, formData2)
+          .then((res: any) => {
+            alert("오늘의 일기가 성공적으로 등록되었습니다.");
+            router.push(`/show/${id}`);
+          })
+          .catch(() => {
+            alert("데이터 생성에 실패했습니다. 다시 시도해주세요.");
+          })
+          .finally(() => {
+            setLoading(false);
+          });
+      }
+
+      // alert("오늘의 일기가 성공적으로 등록되었습니다.");
+      // router.push("/");
     });
   };
 
@@ -261,6 +292,7 @@ export const Content = ({
           )}
         </ModalContent>
       </Modal>
+      {isLoading && <Loading isLoading={isLoading} />}
     </div>
   );
 };

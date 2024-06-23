@@ -1,11 +1,10 @@
 "use client";
-import { usePDF } from "react-to-pdf";
 import QR from "qrcode.react";
 import Image from "next/image";
-import { useState, useEffect } from "react";
-import "./style.css";
+import "../style.css";
+import dayjs from "dayjs";
 
-export const Content = () => {
+export const Content = ({ diary }) => {
   return (
     <div>
       <div className="pdf_wrapper">
@@ -19,11 +18,13 @@ export const Content = () => {
         <div className="flex">
           <div className="flex flex-col justify-between pt-[32px] pb-[28px]">
             <div className="pdf_date flex item-center justify-center text-center">
-              24.06.27
+              {dayjs(diary.released_date?.replace(/-/g, "/")).format(
+                "YY.MM.DD"
+              )}
             </div>
 
             <QR
-              value={"https://pink1016.tistory.com/"}
+              value={process.env.NEXT_PUBLIC_ORIGIN + `/show/${diary.id}`}
               size={156}
               id="qr-gen"
               level={"H"}
@@ -36,7 +37,7 @@ export const Content = () => {
               width={527}
               height={527}
               alt="이미지"
-              src={"/image_sample.jpeg"}
+              src={diary?.image_url}
               className="rounded-[30px]"
             />
 
@@ -52,10 +53,7 @@ export const Content = () => {
 
         <div className="mt-[74px]">
           <div className="text-[40px] font-bold">
-            lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed Lorem,
-            ipsum dolor sit amet consectetur adipisicing elit. Quod temporibus
-            quas sint tempora voluptatibus voluptates, quae tempore numquam
-            placeat, laborum soluta! Numquam cumque, magnam vero eius quasi
+            {diary.content}
           </div>
         </div>
       </div>

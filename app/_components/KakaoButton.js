@@ -29,7 +29,7 @@ export default function KakaoButton() {
     script.onload = () => initializeKakaoLogin();
     document.body.appendChild(script);
 
-    setKakaoRedirect(window.location.origin + "/register/kakao");
+    setKakaoRedirect(process.env.NEXT_PUBLIC_ORIGIN + "/register/kakao");
     return () => script.remove();
   }, []);
 
