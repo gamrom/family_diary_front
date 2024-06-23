@@ -1,4 +1,3 @@
-// components/Loading.js
 "use client";
 
 import Image from "next/image";
