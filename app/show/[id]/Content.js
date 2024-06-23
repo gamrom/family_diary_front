@@ -7,7 +7,7 @@ import { useState, useRef, useEffect } from "react";
 import { ProgressComp } from "./ProgressComp";
 import "react-calendar/dist/Calendar.css";
 import "./style.css";
-import { deleteDiary } from "@/app/_hooks/api";
+import { deleteDiary, getCurrentUser } from "@/app/_hooks/api";
 
 import {
   Modal,
@@ -20,19 +20,38 @@ import Link from "next/link";
 import { LoadingTransform } from "./LoadingTransform";
 
 export const Content = ({ diary }) => {
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const {
+    isOpen,
+    onOpen,
+    onOpenChange,
+    onClose: onCloseFunction,
+  } = useDisclosure();
   const [progress, setProgress] = useState(0);
   const pdfBtnRef = useRef();
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioTime, setAudioTime] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
+  const [stage, setStage] = useState("initial"); // "initial", "printer_email_empty", "printer_email_exist", "send_print"
 
   // when play, calculate progress -> current time / total duration * 100
   const audioRef = useRef();
 
   const onSubmit = () => {
-    setIsLoading(true);
-    pdfBtnRef.current.click();
+    getCurrentUser()
+      .then((res) => {
+        const { id, name, email, profile_url, printer_email } = res.data;
+        if (printer_email === null) {
+          setStage("printer_email_empty");
+        } else {
+          setStage("printer_email_exist");
+        }
+        // setIsLoading(true);
+        // pdfBtnRef.current.click();
+      })
+      .catch((err) => {
+        alert("해당 기능은 로그인이 필요합니다.");
+        onCloseFunction();
+        return;
+      });
   };
 
   // calculate progress when audio is playing after click MediaPlayButton
@@ -63,15 +82,13 @@ export const Content = ({ diary }) => {
   return (
     <div className="flex flex-col items-center">
       <div className="mt-[20px] relative">
-        <div className="w-[354px] h-[354px]">
-          <Image
-            src={diary?.image_url || "/image_sample.jpeg"}
-            width={354}
-            height={354}
-            className="object-cover w-full rounded-[30px] aspect-square"
-            alt="상세이미지"
-          />
-        </div>
+        <Image
+          src={diary?.image_url || "/image_sample.jpeg"}
+          width={354}
+          height={354}
+          className="object-cover w-full rounded-[30px] aspect-square"
+          alt="상세이미지"
+        />
 
         <div className="absolute flex flex-col text-white top-[15px] left-[20px] font-[600]">
           <div className="text-[11px]">
@@ -236,11 +253,7 @@ export const Content = ({ diary }) => {
         <ModalContent className="max-w-[328px] h-[60vh] p-[30px]">
           {(onClose) => (
             <>
-              {isLoading ? (
-                <ModalBody className="flex items-center p-0">
-                  <LoadingTransform onClose={onClose} />
-                </ModalBody>
-              ) : (
+              {stage === "initial" ? (
                 <ModalBody className="flex items-center p-0">
                   <Image
                     src="/circle_char.svg"
@@ -251,7 +264,7 @@ export const Content = ({ diary }) => {
                   />
 
                   <div className="text-center font-[600] text-lg font-[Kodchasan] px-[34px] mt-[37px]">
-                    수현님 180일간 아이와의 추억이 가득 찼네요.
+                    180일간 아이와의 추억이 가득 찼네요.
                     <br /> <br />
                     지금 바로 추억을 육아일기 책으로 만나보시겠어요?
                   </div>
@@ -273,6 +286,57 @@ export const Content = ({ diary }) => {
                     </button>
                   </div>
                 </ModalBody>
+              ) : stage === "printer_email_empty" ? (
+                <ModalBody className="flex items-center p-0">
+                  {/* <Image
+                    src="/circle_char.svg"
+                    className="mt-auto circle-btn-shadow rounded-full"
+                    width={89}
+                    height={89}
+                    alt="메인캐릭터"
+                  /> */}
+
+                  <div className="text-center font-[600] text-lg font-[Kodchasan] px-[34px] mt-[37px]">
+                    프린터 이메일 등록
+                  </div>
+
+                  <div className="text-center font-[600] text-lg font-[Kodchasan] px-[34px] mt-[37px]">
+                    프린터 이메일을 등록하시면 육아일기를 책으로 만들어드립니다.
+                  </div>
+
+                  <div className="">
+                    <input
+                      type="text"
+                      placeholder="프린터 이메일을 입력해주세요"
+                      className="w-full h-[50px] rounded-[30px] border-[1px] border-[#E0E0E0] px-[20px] text-sm font-[500] mt-[20px]"
+                    />
+                  </div>
+
+                  <div className="flex space-x-[19px] w-full mt-auto">
+                    <button
+                      type="button"
+                      onClick={onClose}
+                      className="bg-[#F5F5F5] text-[17px] font-[600] text-black w-full rounded-[30px] pt-[16px] pb-[15px] flex items-center justify-center"
+                    >
+                      취소
+                    </button>
+                    <button
+                      type="button"
+                      onClick={onSubmit}
+                      className="bg-[#FF4D49] text-[17px] font-[600] text-white w-full rounded-[30px] pt-[16px] pb-[15px] flex items-center justify-center"
+                    >
+                      확인
+                    </button>
+                  </div>
+                </ModalBody>
+              ) : stage === "printer_email_exist" ? (
+                <ModalBody className="flex items-center p-0"></ModalBody>
+              ) : (
+                stage === "send_print" && (
+                  <ModalBody className="flex items-center p-0">
+                    <LoadingTransform onClose={onClose} />
+                  </ModalBody>
+                )
               )}
             </>
           )}
