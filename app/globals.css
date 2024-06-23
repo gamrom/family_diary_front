@@ -7,6 +7,10 @@
   margin: auto;
   font-family: "Inter", sans-serif;
   padding: 0 34px;
+  height: 100vh;
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
 }
 
 .react-calendar__navigation__label {
