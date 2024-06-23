@@ -4,40 +4,25 @@ import dayjs from "dayjs";
 import "dayjs/locale/ko";
 dayjs.locale("ko");
 import { useState, useRef, useEffect } from "react";
-
+import { ProgressComp } from "./ProgressComp";
 import "react-calendar/dist/Calendar.css";
 import "./style.css";
-import { Loading } from "../../_components/Loading";
-import { ProgressComp } from "./ProgressComp";
+
 import {
   Modal,
   ModalContent,
-  ModalHeader,
   ModalBody,
-  ModalFooter,
   useDisclosure,
 } from "@nextui-org/modal";
-import { PdfTemplate } from "./PdfTemplate";
 import Link from "next/link";
 
-import { PDFDownloadLink, usePDF } from "@react-pdf/renderer";
-
-import {
-  MediaController,
-  MediaPlayButton,
-  MediaTimeRange,
-  MediaTimeDisplay,
-} from "media-chrome/react";
 import { LoadingTransform } from "./LoadingTransform";
-import { BackBtn } from "@/app/_components/BackBtn";
-
-import { deleteDiary } from "@/app/_hooks/api";
 
 export const Content = ({ diary }) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [progress, setProgress] = useState(0);
   const pdfBtnRef = useRef();
-  const [instance, updateInstance] = usePDF({ document: <PdfTemplate /> });
+  const [isPlaying, setIsPlaying] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -49,20 +34,24 @@ export const Content = ({ diary }) => {
     pdfBtnRef.current.click();
   };
 
-  //calculate progress when audio is playing after click MediaPlayButton
-  // useEffect(() => {
-  //   if (audioRef.current) {
-  //     const audio = audioRef.current;
-  //     const onTimeUpdate = () => {
-  //       const progress = (audio.currentTime / audio.duration) * 100;
-  //       setProgress(progress);
-  //     };
-  //     audio.addEventListener("timeupdate", onTimeUpdate);
-  //     return () => {
-  //       audio.removeEventListener("timeupdate", onTimeUpdate);
-  //     };
-  //   }
-  // }, [audioRef.current]);
+  // calculate progress when audio is playing after click MediaPlayButton
+  useEffect(() => {
+    if (audioRef.current) {
+      const audio = audioRef.current;
+      const onTimeUpdate = () => {
+        const progress = (audio.currentTime / audio.duration) * 100;
+        setProgress(progress);
+      };
+      audio.addEventListener("timeupdate", onTimeUpdate);
+
+      audio.onended = () => {
+        setIsPlaying(false);
+      };
+      return () => {
+        audio.removeEventListener("timeupdate", onTimeUpdate);
+      };
+    }
+  }, [audioRef.current]);
 
   const [audioLoading, setAudioLoading] = useState(true);
   useEffect(() => {
@@ -100,13 +89,6 @@ export const Content = ({ diary }) => {
         </Link>
       </div>
 
-      <a
-        ref={pdfBtnRef}
-        href={instance.url}
-        className="hidden"
-        download="test.pdf"
-      ></a>
-
       {diary?.content ? (
         <div className="text-white px-4 text-center h-[140px] overflow-auto show-text mt-[44px] relative">
           <div dangerouslySetInnerHTML={{ __html: diary.content }}></div>
@@ -123,7 +105,64 @@ export const Content = ({ diary }) => {
       <div className="show-bg"></div>
 
       <div className="fixed bottom-0 pb-[57px]">
-        {!audioLoading && (
+        <div className="bg-transparent mt-[31px] w-full flex-col items-center justify-center w-full">
+          <audio className="hidden" ref={audioRef} src={diary.audio_url} />
+
+          <div className="flex items-center justify-center gap-4">
+            <ProgressComp percent={progress} />
+            {/* <MediaTimeDisplay className="bg-transparent"></MediaTimeDisplay> */}
+          </div>
+          <div className="flex mt-[30px] items-center justify-between gap-[25px]">
+            <button
+              type="button"
+              className="!bg-transparent w-[81px] h-[81px] circle-btn-shadow-show rounded-full bg-white flex items-center justify-center"
+              onClick={() => {
+                if (confirm("정말 삭제하시겠습니까?")) {
+                  deleteDiary(diary.id).then(() => {
+                    alert("삭제되었습니다.");
+                    window.location.href = "/";
+                  });
+                }
+              }}
+            >
+              <Image src="/trash.svg" width={27} height={27} alt="삭제"></Image>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                audioRef.current.play();
+                setIsPlaying(true);
+              }}
+              className="bg-transparent w-[81px] h-[81px] circle-btn-shadow-show rounded-full  flex items-center justify-center"
+            >
+              {isPlaying ? (
+                <Image
+                  src="/pause_white.svg"
+                  width={25}
+                  height={28}
+                  alt="재생"
+                ></Image>
+              ) : (
+                <Image
+                  src="/play_white.svg"
+                  width={36}
+                  height={36}
+                  alt="재생"
+                ></Image>
+              )}
+            </button>
+
+            <button
+              type="button"
+              onClick={onOpen}
+              className="!bg-transparent  w-[81px] h-[81px] circle-btn-shadow-show rounded-full bg-white flex items-center justify-center"
+            >
+              <Image src="/print.svg" width={32} height={28} alt="재생"></Image>
+            </button>
+          </div>
+        </div>
+
+        {/* {!audioLoading && (
           <MediaController
             audio
             className="bg-transparent mt-[31px] w-full flex-col items-center justify-center"
@@ -132,9 +171,11 @@ export const Content = ({ diary }) => {
               ref={audioRef}
               slot="media"
               src={
-                "https://family-diary-real-bucket.s3.ap-northeast-2.amazonaws.com/recorded-audio-1719140363349.wav"
+                // "https://family-diary-real-bucket.s3.ap-northeast-2.amazonaws.com/recorded-audio-1719140363349.wav"
+                "https://stream.mux.com/O4h5z00885HEucNNa1rV02wZapcGp01FXXoJd35AHmGX7g/audio.m4a"
               }
             ></audio>
+
             <div className="flex items-center justify-center gap-4">
               <ProgressComp percent={progress} />
               <MediaTimeDisplay className="bg-transparent"></MediaTimeDisplay>
@@ -181,8 +222,7 @@ export const Content = ({ diary }) => {
                 ></Image>
               </button>
             </div>
-          </MediaController>
-        )}
+          </MediaController> */}
       </div>
 
       <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
