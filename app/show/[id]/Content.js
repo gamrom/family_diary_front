@@ -7,6 +7,7 @@ import { useState, useRef, useEffect } from "react";
 import { ProgressComp } from "./ProgressComp";
 import "react-calendar/dist/Calendar.css";
 import "./style.css";
+import { deleteDiary } from "@/app/_hooks/api";
 
 import {
   Modal,
