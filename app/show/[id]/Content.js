@@ -65,7 +65,9 @@ export const Content = ({ diary }) => {
 
   const onSubmitSendPrint = () => {
     sendPrint().then(() => {
-      setStage("send_print");
+      // setStage("send_print");
+      alert("인쇄가 성공적으로 요청되었습니다.");
+      onCloseFunction();
     });
   }
   
