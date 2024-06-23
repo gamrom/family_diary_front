@@ -7,6 +7,7 @@ import Calendar from "react-calendar";
 import { useRef, useEffect, useState, Suspense } from "react";
 import "react-calendar/dist/Calendar.css";
 import "dayjs/locale/ko";
+
 import {
   Modal,
   ModalContent,
@@ -51,6 +52,7 @@ export const Content = ({ diaries, initialDiary, user }) => {
 
   console.log("diaries", diaries);
   console.log("selectday", selectDay);
+  console.log(currentDiary);
 
   const [pickDiaries, setPickDiaries] = useState([]);
   useEffect(() => {
@@ -99,73 +101,67 @@ export const Content = ({ diaries, initialDiary, user }) => {
         onActiveStartDateChange={({ activeStartDate }) => {
           setSelectDay(dayjs(activeStartDate));
         }}
+        tileClassName={"relative"}
         tileContent={({ date, view }) => {
-          const diary = diaries.find((diary) =>
-            dayjs(diary.date).isSame(date, "day"),
-          );
+          const diary = checkDiary(date);
           if (diary) {
-            return <div className="text-[10px] font-[400]">✅</div>;
+            return (
+              <Image
+                src="/date_point.svg"
+                width={6}
+                height={6}
+                alt="포인트"
+                className="absolute top-[75%] left-[42%]"
+              />
+            );
           }
           return null;
         }}
       />
-      {currentDiary && (
-        <button
-          onClick={() => {
-            router.push(`/show/${currentDiary.id}`);
-          }}
+      {currentDiary ? (
+        <Link
+          href={`/show/${currentDiary.id}}`}
+          className="w-full flex flex-col bottom_main-content mt-[44px] py-[17px] px-[19px] rounded-[12px]"
         >
-          추억 재생하기
-        </button>
-      )}
-      {pickDiaries.length > 0 ? (
-        pickDiaries?.map((pickDiaries) => {
-          <div
-            className="w-full rounded-[12px] bg-white  flex flex-col items-center justify-center py-[19px] px-[19px] mt-[27px]"
-            style={{
-              boxShadow: "0px 4px 20px 1px rgba(0, 0, 0, 0.1)",
-            }}
-          >
-            <div className="flex w-full">
-              <div className="text-[15px]">
-                <span>17</span>
-                <span className="font-[Kodchasan]">일 월요일</span>
+          <div className="text-[15px] text-[#89898B] font-[600]">
+            {dayjs(selectDay).format("D일 ddd요일")}
+          </div>
+
+          <div className="flex mt-[14px] gap-[11px] flex">
+            <Image
+              width={148}
+              height={148}
+              className="rounded-[15px] object-cover aspect-square"
+              alt="show사진"
+              src={currentDiary.image_url}
+            />
+
+            <div className="flex flex-col justify-between w-full">
+              <div className="text-[#C6C6C8] text-sm font-[500] text-[Kodchasan] line-clamp-4">
+                {currentDiary.content}
               </div>
-            </div>
-            <div className="grid grid-cols-2 gap-[11px] mt-[17px]">
-              <Image
-                src="/image_sample.jpeg"
-                className="rounded-lg w-[148px] object-cover h-[148px]"
-                width={111}
-                height={111}
-                alt="상세이미지"
-              />
-              <div className="flex flex-col justify-between">
-                <div className="text-[#C6C6C8] line-clamp-4">
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolor
-                  reiciendis a accusamus, nihil harum ullam optio neque
-                  voluptatum placeat cum nesciunt. Doloremque unde fuga quo sunt
-                  porro error saepe. Harum. Lorem ipsum dolor sit amet
-                  consectetur adipisicing elit. Dolor reiciendis a accusamus,
-                  nihil harum ullam optio neque voluptatum placeat cum nesciunt.
-                  Doloremque unde fuga quo sunt porro error saepe. Harum.
-                  {/* //data 들어가야함 */}
-                </div>
-                <Link
-                  href="/"
-                  className="bg-[#FF4D49] text-[17px] font-[600] text-white
-                    w-full rounded-[25px] py-[15px] flex items-center
-                    justify-center"
+
+              <div className="bg-[#FF4D49] text-[17px] font-[600] text-white w-full rounded-[25px] py-[15px] flex gap-[2px] items-center justify-center">
+                <svg
+                  width="17"
+                  height="17"
+                  viewBox="0 0 17 17"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
                 >
-                  확인
-                </Link>
+                  <path
+                    d="M14 6.76795C15.3333 7.53775 15.3333 9.46225 14 10.2321L7.25 14.1292C5.91666 14.899 4.25 13.9367 4.25 12.3971L4.25 4.60288C4.25 3.06328 5.91667 2.10103 7.25 2.87083L14 6.76795Z"
+                    fill="white"
+                  />
+                </svg>
+                추억 보기
               </div>
             </div>
-          </div>;
-        })
+          </div>
+        </Link>
       ) : (
         <div className="w-full flex h-[50vh] flex-col bottom_main-content mt-[44px] py-[17px] px-[19px] rounded-[12px]">
-          <div className="text-[15px] text-[#89898B]">
+          <div className="text-[15px] text-[#89898B] font-[600]">
             {dayjs(selectDay).format("D일 ddd요일")}
           </div>
 
@@ -209,7 +205,14 @@ export const Content = ({ diaries, initialDiary, user }) => {
                       dayjs(diary.date).isSame(date, "day"),
                     );
                     if (diary) {
-                      return <div className="text-[10px] font-[400]">✅</div>;
+                      return (
+                        <Image
+                          src="/date_poing.svg"
+                          width={6}
+                          height={6}
+                          alt="포인트"
+                        />
+                      );
                     }
                     return null;
                   }}
