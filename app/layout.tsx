@@ -40,7 +40,7 @@ export default function RootLayout({
           content="바쁜 부모들을 위해 간편하게 작성 가능한 육아일기"
         />
 
-        <meta property="og:url" content="https://www.gambodong.com/" />
+        <meta property="og:url" content="https:/family.fivedice.site" />
         <meta property="og:type" content="website" />
         <meta property="og:title" content="패밀리 다이어리" />
         <meta property="og:description" content="" />
@@ -48,7 +48,7 @@ export default function RootLayout({
 
         <meta name="twitter:card" content="summary_large_image" />
         <meta property="twitter:domain" content="gambodong.com" />
-        <meta property="twitter:url" content="https://www.gambodong.com/" />
+        <meta property="twitter:url" content="https:/family.fivedice.site" />
         <meta name="twitter:title" content="패밀리 다이어리" />
         <meta name="twitter:description" content="" />
         <meta name="twitter:image" content="/og_image.jpg" />
