@@ -150,7 +150,7 @@ export const Content = ({ diaries, initialDiary, user }) => {
 
             <div className="flex items-start mt-[17px]">
               <Image
-                src="/image_sample.png"
+                src="/image_sample.jpeg"
                 className="object-contain rounded-lg"
                 width={111}
                 height={111}
@@ -233,16 +233,6 @@ export const Content = ({ diaries, initialDiary, user }) => {
                     return null;
                   }}
                 />
-
-                <div className="flex space-x-[19px]">
-                  <button
-                    onClick={onClose}
-                    type="button"
-                    className="bg-[#F5F5F5] text-[17px] font-[600] text-[#89898B] w-full rounded-[25px] py-[15px]"
-                  >
-                    취소
-                  </button>
-                </div>
               </ModalBody>
             </>
           )}

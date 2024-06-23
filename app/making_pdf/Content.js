@@ -49,7 +49,7 @@ export const Content = () => {
               width={527}
               height={527}
               alt="이미지"
-              src={"/image_sample.png"}
+              src={"/image_sample.jpeg"}
               className="rounded-[30px]"
             />
 

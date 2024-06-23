@@ -73,8 +73,25 @@ export const Content = ({
     };
   }, [imgRef]);
 
+  console.log(sendParams.content.length);
+
   const onSubmit = () => {
     const formData = new FormData();
+
+    if (sendParams.content.length === 0) {
+      alert("내용을 입력해주세요.");
+      return;
+    }
+
+    if (sendParams.image.length > 300) {
+      alert("글자 수가 너무 많습니다. 300자 이내로 작성해주세요.");
+      return;
+    }
+
+    if (!imgRef.current?.files?.[0]) {
+      alert("사진을 등록해주세요.");
+      return;
+    }
 
     formData.append("content", sendParams.content);
     if (imgRef.current?.files?.[0]) {
@@ -107,7 +124,7 @@ export const Content = ({
           />
         </button>
       </ClosePageNav>
-      <div className="flex flex-col mt-4">
+      <div className="flex flex-col mt-4 mb-auto">
         <div
           className="w-full px-[19px] pt-[26px] pb-[12px] flex flex-col rounded-[12px]"
           style={{
@@ -180,26 +197,26 @@ export const Content = ({
           )}
         </div>
 
-        <BottomFix>
-          <div className="flex space-x-[19px] w-full">
-            <button
-              type="button"
-              className="bg-[#F5F5F5] text-[17px] font-[600] text-black w-full rounded-[30px] pt-[16px] pb-[15px] flex items-center justify-center"
-            >
-              녹음하기
-            </button>
-            <button
-              type="button"
-              onClick={onSubmit}
-              className="bg-[#FF4D49] text-[17px] font-[600] text-white w-full rounded-[30px] pt-[16px] pb-[15px] flex items-center justify-center"
-            >
-              완료하기
-            </button>
-          </div>
-        </BottomFix>
-
         <input ref={imgRef} type="file" accept="image/*" hidden />
       </div>
+
+      <BottomFix>
+        <div className="flex space-x-[19px] w-full">
+          <button
+            type="button"
+            className="bg-[#F5F5F5] text-[17px] font-[600] text-black w-full rounded-[30px] pt-[16px] pb-[15px] flex items-center justify-center"
+          >
+            녹음하기
+          </button>
+          <button
+            type="button"
+            onClick={onSubmit}
+            className="bg-[#FF4D49] text-[17px] font-[600] text-white w-full rounded-[30px] pt-[16px] pb-[15px] flex items-center justify-center"
+          >
+            완료하기
+          </button>
+        </div>
+      </BottomFix>
 
       <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
         <ModalContent className="max-w-[328px] py-4">
