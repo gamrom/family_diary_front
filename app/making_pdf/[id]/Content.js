@@ -24,7 +24,7 @@ export const Content = ({ diary }) => {
             </div>
 
             <QR
-              value={window.location.origin + `/show/${diary.id}`}
+              value={process.env.NEXT_PUBLIC_ORIGIN + `/show/${diary.id}`}
               size={156}
               id="qr-gen"
               level={"H"}

@@ -15,7 +15,7 @@ const KakaoLoginContent = () => {
   // if (typeof window !== "undefined") {
   postKakaoAuth({
     code,
-    redirect_uri: `${window?.location?.origin}/register/kakao`,
+    redirect_uri: `${process.env.NEXT_PUBLIC_ORIGIN}/register/kakao`,
   })
     .then((res) => {
       if (res.status === 200) {
