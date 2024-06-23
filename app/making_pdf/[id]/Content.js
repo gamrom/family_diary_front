@@ -38,7 +38,7 @@ export const Content = ({ diary }) => {
               height={527}
               alt="이미지"
               src={diary?.image_url}
-              className="rounded-[30px]"
+              className="rounded-[30px] object-cover aspect-square"
             />
 
             <Image

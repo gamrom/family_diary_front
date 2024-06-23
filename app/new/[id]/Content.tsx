@@ -118,16 +118,19 @@ export const Content = ({
 
     if (sendParams.content.length === 0) {
       alert("내용을 입력해주세요.");
+      setLoading(false);
       return;
     }
 
     if (sendParams.content.length > 300) {
       alert("글자 수가 너무 많습니다. 300자 이내로 작성해주세요.");
+      setLoading(false);
       return;
     }
 
     if (!imgRef.current?.files?.[0]) {
       alert("사진을 등록해주세요.");
+      setLoading(false);
       return;
     }
 
