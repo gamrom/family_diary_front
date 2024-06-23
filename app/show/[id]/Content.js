@@ -6,7 +6,7 @@ dayjs.locale("ko");
 import { useState, useRef, useEffect } from "react";
 import { ProgressComp } from "./ProgressComp";
 import "react-calendar/dist/Calendar.css";
-import "./style.css";
+
 import {
   deleteDiary,
   getCurrentUser,
@@ -107,6 +107,7 @@ export const Content = ({ diary }) => {
     setAudioLoading(false);
   }, []);
 
+  console.log(diary);
   return (
     <div className="flex flex-col items-center">
       <div className="mt-[20px] relative">
@@ -145,10 +146,15 @@ export const Content = ({ diary }) => {
         ></div>
       </div>
 
-      <div className="show-bg"></div>
+      <div
+        className="max-w-[400px] blur-[20px] fixed w-full h-full top-0 translate-x-[-50%] left-[50%] z-[-1] before:absolute before:top-0 before:left-0 before:w-full before:h-full before:bg-black/30 before:z-[1]"
+        style={{
+          background: `url(${diary?.image_url})`,
+        }}
+      ></div>
 
       <div className="fixed bottom-0 pb-[57px]">
-        <div className="bg-transparent mt-[31px] w-full flex-col items-center justify-center w-full">
+        <div className="bg-transparent mt-[31px] flex-col items-center justify-center w-full">
           <audio className="hidden" ref={audioRef} src={diary.audio_url} />
 
           <div className="flex items-center justify-center gap-4">
@@ -226,7 +232,7 @@ export const Content = ({ diary }) => {
                 <ModalBody className="flex items-center p-0">
                   <Image
                     src="/circle_char.svg"
-                    className="mt-auto circle-btn-shadow rounded-full"
+                    className="mt-auto rounded-full circle-btn-shadow"
                     width={89}
                     height={89}
                     alt="메인캐릭터"

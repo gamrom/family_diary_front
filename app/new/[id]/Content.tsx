@@ -15,6 +15,7 @@ import Calendar from "react-calendar";
 import { useRef, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Loading } from "@/app/_components/Loading";
+import { ProgressComp } from "./ProgressComp";
 
 import "react-calendar/dist/Calendar.css";
 
@@ -38,6 +39,7 @@ export const Content = ({
 }) => {
   const router = useRouter();
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const audioRef = useRef<HTMLAudioElement>(null);
 
   const [sendParams, setSendParams] = useState({
     date: dayjs(diary?.released_date?.replace(/-/g, "/")).format("YYYY-MM-DD"),
@@ -49,6 +51,10 @@ export const Content = ({
   const addImage = () => {
     imgRef.current?.click();
   };
+
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [audioTime, setAudioTime] = useState<any>("00:00");
 
   useEffect(() => {
     const handleFile = (e: Event) => {
@@ -76,6 +82,34 @@ export const Content = ({
     };
   }, [imgRef]);
 
+  const [audioLength, setAudioLength] = useState(0);
+
+  useEffect(() => {
+    if (audioRef.current) {
+      if (diary) {
+        audioRef.current.src = diary.audio_url;
+        setAudioLength(audioRef.current.duration);
+      }
+      setAudioLength(audioRef.current.duration);
+      const audio = audioRef.current;
+      const onTimeUpdate = () => {
+        const progress = (audio.currentTime / audio.duration) * 100;
+        setProgress(progress);
+        setAudioTime(audio.currentTime);
+      };
+      audio.addEventListener("timeupdate", onTimeUpdate);
+
+      audio.onended = () => {
+        setIsPlaying(false);
+      };
+      return () => {
+        audio.removeEventListener("timeupdate", onTimeUpdate);
+      };
+    }
+  }, [audioRef.current, diary]);
+
+  console.log(audioRef.current);
+
   console.log(sendParams.content.length);
 
   const onSubmit = () => {
@@ -84,16 +118,19 @@ export const Content = ({
 
     if (sendParams.content.length === 0) {
       alert("내용을 입력해주세요.");
+      setLoading(false);
       return;
     }
 
     if (sendParams.content.length > 300) {
       alert("글자 수가 너무 많습니다. 300자 이내로 작성해주세요.");
+      setLoading(false);
       return;
     }
 
     if (!imgRef.current?.files?.[0]) {
       alert("사진을 등록해주세요.");
+      setLoading(false);
       return;
     }
 
@@ -153,15 +190,81 @@ export const Content = ({
           </BackBtn>
         </div>
       </ClosePageNav>
-      <div className="flex flex-col mt-4 mb-auto">
-        {/* <div
+      <div className="flex flex-col w-full mt-4 mb-auto">
+        <div
           className="w-full px-[19px] pt-[26px] pb-[29px] flex flex-col rounded-[12px]"
           style={{
             boxShadow: "0px 4px 20px 1px #0000001A",
           }}
         >
           <div className="font-[600] text-xs">일기 듣기</div>
-        </div> */}
+          {isPlaying ? (
+            <div className="flex items-center justify-between w-full px-[17px] mt-[16px]">
+              <button
+                onClick={() => {
+                  if (audioRef.current) {
+                    audioRef.current.pause();
+                    setIsPlaying(false);
+                  }
+                }}
+                type="button"
+              >
+                <Image
+                  src="/pause_gray.svg"
+                  width={16}
+                  height={16}
+                  alt="재생"
+                />
+              </button>
+
+              <ProgressComp percent={progress} />
+              <div className="text-[#89898B]">
+                {`${
+                  Math.floor(audioTime / 60)
+                    .toString()
+                    .padStart(2, "0") +
+                  ":" +
+                  Math.floor(audioTime % 60)
+                    .toString()
+                    .padStart(2, "0")
+                } / ${audioLength}`}
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center justify-between w-full px-[17px] mt-[16px]">
+              <button
+                onClick={() => {
+                  if (audioRef.current) {
+                    audioRef.current.play();
+                    setIsPlaying(true);
+                  }
+                }}
+                type="button"
+              >
+                <Image src="/play_gray.svg" width={16} height={16} alt="재생" />
+              </button>
+              <Image
+                src="/progress_gray_0.svg"
+                width={133}
+                height={36}
+                alt="진행0"
+              />
+              <div className="text-[#89898B]">
+                {/* {audioRef.current && audioTime} */}
+                {/* audioTime to 00:00 format */}
+                {/* {`${Math.floor(audioTime / 60)
+                  .toString()
+                  .padStart(2, "0")}:${Math.floor(audioTime % 60)
+                  .toString()
+                  .padStart(2, "0")}`}
+                {" / "}
+                {audioRef.current && audioRef.current.duration} */}
+
+                {`00:00 / ${audioLength}`}
+              </div>
+            </div>
+          )}
+        </div>
 
         <div
           className="w-full px-[19px] pt-[26px] pb-[12px] flex flex-col rounded-[12px] mt-[25px]"
@@ -237,6 +340,8 @@ export const Content = ({
 
         <input ref={imgRef} type="file" accept="image/*" hidden />
       </div>
+
+      <audio ref={audioRef} className="hidden" src={diary.audio_url} />
 
       <BottomFix>
         <div className="flex space-x-[19px] w-full">
