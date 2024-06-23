@@ -2,6 +2,8 @@ export const ProgressComp = ({ percent }) => {
   // Calculate the width based on the percentage
   const width = (percent / 100) * 340;
 
+  console.log("width", width);
+
   return (
     <svg
       width="340"
