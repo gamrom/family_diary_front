@@ -1,6 +1,6 @@
 {
   "functions": {
-    "api/**/*.js": {
+    "app/api/**/*.js": {
       "includeFiles": "node_modules/puppeteer/.local-chromium/**"
     }
   },
