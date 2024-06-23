@@ -114,7 +114,7 @@ export const Content = ({ diary }) => {
           src={diary?.image_url || "/image_sample.jpeg"}
           width={354}
           height={354}
-          className="object-cover w-full rounded-[30px] aspect-square"
+          className="object-cover rounded-[30px] aspect-square"
           alt="상세이미지"
         />
 
@@ -139,7 +139,10 @@ export const Content = ({ diary }) => {
       </div>
 
       <div className="text-white px-4 text-center h-[140px] overflow-auto show-text mt-[44px] relative">
-        <div dangerouslySetInnerHTML={{ __html: diary.content }}></div>
+        <div
+          className="whitespace-pre-wrap"
+          dangerouslySetInnerHTML={{ __html: diary.content }}
+        ></div>
       </div>
 
       <div className="show-bg"></div>
