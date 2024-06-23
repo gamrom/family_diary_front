@@ -38,17 +38,11 @@ export default async function Home() {
     return <div>일기를 불러오는 중에 오류가 발생했습니다.</div>;
   }
 
-  const checkDiary = (date, diaries) => {
-    return diaries.find((diary) => dayjs(diary.date).isSame(date, "day"));
-  };
-
-  const initialDiary = checkDiary(dayjs(), diaries);
-
   console.log("user", user);
 
   return (
     <div className="main-container">
-      <Content diaries={diaries} initialDiary={initialDiary} user={user} />
+      <Content diaries={diaries} user={user} />
     </div>
   );
 }

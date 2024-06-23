@@ -24,8 +24,9 @@ import { BackBtn } from "../_components/BackBtn";
 import { ProfileBtn } from "../_components/ProfileBtn";
 import Link from "next/link";
 import { LoadingFallback } from "../_components/LoadingFallback";
+import { select } from "@nextui-org/react";
 
-export const Content = ({ diaries, initialDiary, user }) => {
+export const Content = ({ diaries, user }) => {
   const router = useRouter();
 
   //calendar
@@ -36,32 +37,25 @@ export const Content = ({ diaries, initialDiary, user }) => {
     isOpen: createConfirmModalIsOpen,
     onOpen: createConfirmModalOnOpen,
     onOpenChange: createConfirmModalOnOpenChange,
+    onClose: createConfirmModalOnClose,
   } = useDisclosure();
 
   const [selectDay, setSelectDay] = useState(dayjs());
 
-  const [currentDiary, setCurrentDiary] = useState(initialDiary || null);
-
-  const checkDiary = (date) => {
-    return diaries.find((diary) => dayjs(diary.date).isSame(date, "day"));
-  };
-
-  useEffect(() => {
-    setCurrentDiary(checkDiary(selectDay));
-  }, [selectDay]);
-
   console.log("diaries", diaries);
   console.log("selectday", selectDay);
-  console.log(currentDiary);
 
-  const [pickDiaries, setPickDiaries] = useState([]);
+  const [pickDiary, setPickDiary] = useState({});
   useEffect(() => {
-    setPickDiaries(
-      diaries.filter((diary) => dayjs(diary.date).isSame(selectDay, "day")),
+    setPickDiary(
+      diaries.filter(
+        (diary) =>
+          diary.released_date === dayjs(selectDay).format("YYYY-MM-DD"),
+      )[0],
     );
-  }, [currentDiary]);
+  }, [selectDay]);
 
-  console.log(user);
+  console.log(selectDay);
 
   return (
     <>
@@ -103,8 +97,12 @@ export const Content = ({ diaries, initialDiary, user }) => {
         }}
         tileClassName={"relative"}
         tileContent={({ date, view }) => {
-          const diary = checkDiary(date);
-          if (diary) {
+          // diaries released_date list include tile date, return point image
+          const ds = diaries.find(
+            (diary) => diary.released_date === dayjs(date).format("YYYY-MM-DD"),
+          );
+
+          if (ds) {
             return (
               <Image
                 src="/date_point.svg"
@@ -115,12 +113,11 @@ export const Content = ({ diaries, initialDiary, user }) => {
               />
             );
           }
-          return null;
         }}
       />
-      {currentDiary ? (
+      {pickDiary ? (
         <Link
-          href={`/show/${currentDiary.id}}`}
+          href={`/show/${pickDiary.id}}`}
           className="w-full flex flex-col bottom_main-content mt-[44px] py-[17px] px-[19px] rounded-[12px]"
         >
           <div className="text-[15px] text-[#89898B] font-[600]">
@@ -133,12 +130,12 @@ export const Content = ({ diaries, initialDiary, user }) => {
               height={148}
               className="rounded-[15px] object-cover aspect-square"
               alt="show사진"
-              src={currentDiary.image_url}
+              src={pickDiary.image_url}
             />
 
             <div className="flex flex-col justify-between w-full">
-              <div className="text-[#C6C6C8] text-sm font-[500] text-[Kodchasan] line-clamp-4">
-                {currentDiary.content}
+              <div className="text-[#C6C6C8] text-sm font-[500] text-[Kodchasan] line-clamp-4 break-all">
+                {pickDiary.content}
               </div>
 
               <div className="bg-[#FF4D49] text-[17px] font-[600] text-white w-full rounded-[25px] py-[15px] flex gap-[2px] items-center justify-center">
@@ -200,21 +197,26 @@ export const Content = ({ diaries, initialDiary, user }) => {
                   onActiveStartDateChange={({ activeStartDate }) => {
                     setSelectDay(dayjs(activeStartDate));
                   }}
+                  tileClassName={"relative"}
                   tileContent={({ date, view }) => {
-                    const diary = diaries.find((diary) =>
-                      dayjs(diary.date).isSame(date, "day"),
+                    // diaries released_date list include tile date, return point image
+                    const ds = diaries.find(
+                      (diary) =>
+                        diary.released_date ===
+                        dayjs(date).format("YYYY-MM-DD"),
                     );
-                    if (diary) {
+
+                    if (ds) {
                       return (
                         <Image
-                          src="/date_poing.svg"
+                          src="/date_point.svg"
                           width={6}
                           height={6}
                           alt="포인트"
+                          className="absolute top-[75%] left-[42%]"
                         />
                       );
                     }
-                    return null;
                   }}
                 />
               </ModalBody>
@@ -222,13 +224,41 @@ export const Content = ({ diaries, initialDiary, user }) => {
           )}
         </ModalContent>
       </Modal>
+
       <Modal
         isOpen={createConfirmModalIsOpen}
         onOpenChange={createConfirmModalOnOpen}
+        hideCloseButton={true}
       >
         <ModalContent className="max-w-[328px] py-4">
-          {(onClose) => (
-            <div>
+          <div>
+            {diaries.find((diary) => {
+              return dayjs(diary.date).isSame(dayjs(), "day");
+            }).length > 0 ? (
+              <ModalBody className="flex flex-col items-center">
+                <Image
+                  src="/sun.svg"
+                  alt="책얼굴"
+                  width={105}
+                  height={105}
+                  className="mt-[126px]"
+                />
+                <div className="font-[600] font-[Kodchasan] text-lg text-center mt-[18px]">
+                  이미 작성한 <br /> 오늘의 일기가 있어요!
+                </div>
+                <div className="flex space-x-[19px] w-full mt-[116px]">
+                  <button
+                    type="button"
+                    onClick={createConfirmModalOnClose}
+                    className="bg-[#FF4D49] text-[17px] font-[600] text-white
+                    w-full rounded-[25px] pt-[16px] pb-[15px] flex items-center
+                    justify-center"
+                  >
+                    확인
+                  </button>
+                </div>
+              </ModalBody>
+            ) : (
               <ModalBody className="flex flex-col items-center">
                 <Image
                   src="/book_face.svg"
@@ -243,7 +273,7 @@ export const Content = ({ diaries, initialDiary, user }) => {
                 <div className="flex space-x-[19px] w-full mt-[116px]">
                   <button
                     type="button"
-                    onClick={onClose}
+                    onClick={createConfirmModalOnClose}
                     className="bg-[#F5F5F5] text-[17px] font-[600] w-full rounded-[25px] pt-[16px] pb-[15px] flex items-center justify-center text-[#89898B]"
                   >
                     취소
@@ -258,8 +288,8 @@ export const Content = ({ diaries, initialDiary, user }) => {
                   </Link>
                 </div>
               </ModalBody>
-            </div>
-          )}
+            )}
+          </div>
         </ModalContent>
       </Modal>
       <BottomFix>

@@ -63,13 +63,15 @@ export const Content = ({ diary }) => {
   return (
     <div className="flex flex-col items-center">
       <div className="mt-[20px] relative">
-        <Image
-          src={diary?.image_url || "/image_sample.jpeg"}
-          width={354}
-          height={354}
-          className="object-cover w-full rounded-[30px] aspect-square"
-          alt="상세이미지"
-        />
+        <div className="w-[354px] h-[354px]">
+          <Image
+            src={diary?.image_url || "/image_sample.jpeg"}
+            width={354}
+            height={354}
+            className="object-cover w-full rounded-[30px] aspect-square"
+            alt="상세이미지"
+          />
+        </div>
 
         <div className="absolute flex flex-col text-white top-[15px] left-[20px] font-[600]">
           <div className="text-[11px]">

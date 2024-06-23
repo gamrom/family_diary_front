@@ -23,6 +23,7 @@ import { BottomFix } from "@/app/_components/BottomFix";
 dayjs.locale("ko");
 
 import { updateDiary } from "@/app/_hooks/api";
+import { BackBtn } from "@/app/_components/BackBtn";
 
 export const Content = ({
   diary,
@@ -136,22 +137,21 @@ export const Content = ({
   return (
     <div className="h-screen flex justify-between flex-col">
       <ClosePageNav>
-        <button
-          onClick={onOpen}
-          type="button"
-          className="flex items-center justify-center"
-        >
-          <div className="text-xl font-[600]">
-            {dayjs().format("M월 DD일 ddd요일")}
-          </div>
+        <div className="flex items-center justify-between w-full">
           <Image
-            src="/drowdownarrow.svg"
-            alt="dropdown"
-            width={10}
-            height={10}
-            className="ml-[10px]"
+            src="/x.svg"
+            width={13}
+            height={13}
+            alt="뒤로가기"
+            className="invisible"
           />
-        </button>
+          <div className="text-xl font-[600]">
+            {dayjs(diary.released_date).format("M월 DD일 ddd요일")}
+          </div>
+          <BackBtn>
+            <Image src="/x.svg" width={13} height={13} alt="뒤로가기" />
+          </BackBtn>
+        </div>
       </ClosePageNav>
       <div className="flex flex-col mt-4 mb-auto">
         <div

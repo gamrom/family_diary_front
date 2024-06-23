@@ -6,7 +6,7 @@ export const BackBtn = ({
   style,
 }: {
   children?: React.ReactNode;
-  style: string;
+  style?: string;
 }) => {
   const router = useRouter();
   return (

@@ -18,6 +18,7 @@ import { RecordingComp } from "./RecordingComp";
 import { formatTime } from "@/app/utils";
 
 export const Content = ({ date }) => {
+  console.log(date);
   const router = useRouter();
   const audioRef = useRef(null);
   const [transcript, setTranscript] = useState("");
