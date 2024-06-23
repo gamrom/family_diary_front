@@ -53,8 +53,6 @@ export const Content = ({ diary }) => {
           setPrinterEmail(printer_email);
           setStage("printer_email_exist");
         }
-        // setIsLoading(true);
-        // pdfBtnRef.current.click();
       })
       .catch((err) => {
         alert("해당 기능은 로그인이 필요합니다.");
@@ -64,9 +62,9 @@ export const Content = ({ diary }) => {
   };
 
   const onSubmitSendPrint = () => {
+    setStage("send_print");
     sendPrint().then(() => {
-      // setStage("send_print");
-      alert("인쇄가 성공적으로 요청되었습니다.");
+      alert("추억이 책으로 출력되는 중입니다~!");
       onCloseFunction();
     });
   }
