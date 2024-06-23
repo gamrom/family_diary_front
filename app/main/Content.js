@@ -236,9 +236,11 @@ export const Content = ({ diaries, user }) => {
       >
         <ModalContent className="max-w-[328px] py-4">
           <div>
-            {diaries.find((diary) => {
-              return dayjs(diary.date).isSame(dayjs(), "day");
-            }).length > 0 ? (
+            {diaries.filter(
+              (diary) =>
+                dayjs(diary.released_date).format("YYYY-MM-DD") ===
+                dayjs().format("YYYY-MM-DD"),
+            )?.length > 0 ? (
               <ModalBody className="flex flex-col items-center">
                 <Image
                   src="/sun.svg"

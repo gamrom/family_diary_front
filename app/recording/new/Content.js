@@ -217,7 +217,7 @@ export const Content = ({ date }) => {
         {recording === "ready" && (
           <button
             type="button"
-            className="circle-btn-shadow rounded-full"
+            className="rounded-full circle-btn-shadow"
             onClick={startRecording}
           >
             <Image src="/circle.svg" alt="준비" width={81} height={81} />
