@@ -16,6 +16,7 @@ import { Loading } from "@/app/_components/Loading";
 import { recommendSentences } from "@/app/constants";
 import { RecordingComp } from "./RecordingComp";
 import { formatTime } from "@/app/utils";
+import dayjs from "dayjs";
 
 export const Content = ({ date }) => {
   console.log(date);
@@ -32,7 +33,7 @@ export const Content = ({ date }) => {
 
   useEffect(() => {
     setRecommendText(
-      recommendSentences[Math.floor(Math.random() * recommendSentences.length)],
+      recommendSentences[Math.floor(Math.random() * recommendSentences.length)]
     );
   }, []);
 
@@ -116,7 +117,7 @@ export const Content = ({ date }) => {
 
         audioRef.current?.addEventListener("timeupdate", () => {
           setProgress(
-            (audioRef.current.currentTime / audioRef.current.duration) * 100,
+            (audioRef.current.currentTime / audioRef.current.duration) * 100
           );
 
           setRecordingTime(formatTime(audioRef.current.currentTime));
@@ -154,7 +155,7 @@ export const Content = ({ date }) => {
         .then((responseTranscript) => {
           const { text, audio_url } = responseTranscript.data;
           createDiary({
-            released_date: date ? date : new Date(),
+            released_date: date ? date : dayjs().format("YYYY-MM-DD"),
             content: text,
             audio_url: audio_url,
           })
@@ -179,7 +180,7 @@ export const Content = ({ date }) => {
         setRecordingTime(
           `${minutes < 10 ? `0${minutes}` : minutes}:${
             seconds < 10 ? `0${seconds}` : seconds
-          }`,
+          }`
         );
       }, 1000);
       return () => clearInterval(interval);
