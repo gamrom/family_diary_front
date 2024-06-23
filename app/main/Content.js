@@ -31,6 +31,7 @@ export const Content = ({ diaries, user }) => {
 
   //calendar
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const [isLoading, setIsLoading] = useState(true);
 
   //modal
   const {
@@ -47,12 +48,15 @@ export const Content = ({ diaries, user }) => {
 
   const [pickDiary, setPickDiary] = useState({});
   useEffect(() => {
-    setPickDiary(
-      diaries.filter(
-        (diary) =>
-          diary.released_date === dayjs(selectDay).format("YYYY-MM-DD"),
-      )[0],
-    );
+    if (selectDay) {
+      setPickDiary(
+        diaries.filter(
+          (diary) =>
+            diary.released_date === dayjs(selectDay).format("YYYY-MM-DD"),
+        )[0],
+      );
+      setIsLoading(false);
+    }
   }, [selectDay]);
 
   console.log(selectDay);
@@ -115,7 +119,7 @@ export const Content = ({ diaries, user }) => {
           }
         }}
       />
-      {pickDiary ? (
+      {!isLoading && pickDiary ? (
         <Link
           href={`/show/${pickDiary.id}}`}
           className="w-full flex flex-col bottom_main-content mt-[44px] py-[17px] px-[19px] rounded-[12px]"
