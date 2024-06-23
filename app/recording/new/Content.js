@@ -13,22 +13,18 @@ import { useMicrophonePermission } from "@/app/_hooks/useMicrophoneAccess";
 import { Loading } from "@/app/_components/Loading";
 import { recommendSentences } from "@/app/constants";
 import { RecordingComp } from "./RecordingComp";
-
-import { useRouter } from "next/navigation";
-
-import { createDiary } from "@/app/_hooks/api";
+import { formatTime } from "@/app/utils";
 
 export const Content = () => {
-  const router = useRouter();
   const audioRef = useRef(null);
   const [transcript, setTranscript] = useState("");
   const [recording, setRecording] = useState("ready");
   const [recordingTime, setRecordingTime] = useState("00:00");
   const [audioUrl, setAudioUrl] = useState(null); // New state to store the recorded audio URL
-
-  // 노종원 생성 -> 녹음용 blob
   const [audioBlobState, setAudioBlobState] = useState(null);
   const [recommendText, setRecommendText] = useState("");
+
+  const [isLoading, setLoading] = useState(false);
 
   useEffect(() => {
     setRecommendText(
@@ -43,24 +39,43 @@ export const Content = () => {
   const mediaStreamRef = useRef(null);
   const [progress, setProgress] = useState(0);
 
-  // const [uploadedAudioUrl, setUploadedAudioUrl] = useState(null);
-
   const startRecording = async () => {
-    console.log("startRecording");
-    // Start speech recognition
+    setProgress(0);
+    setRecording("00:00");
+    if (permissionState === "prompt") {
+      requestMicrophone();
+      return;
+    }
 
-    // Start audio recording
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    mediaStreamRef.current = stream; // Save the media stream
-    mediaRecorderRef.current = new MediaRecorder(stream);
-    audioChunksRef.current = [];
-    mediaRecorderRef.current.ondataavailable = (event) => {
-      audioChunksRef.current.push(event.data);
-    };
-    mediaRecorderRef.current.start();
+    if (permissionState === "granted") {
+      setRecording("recording");
+
+      // Start audio recording
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaStreamRef.current = stream; // Save the media stream
+      mediaRecorderRef.current = new MediaRecorder(stream);
+      audioChunksRef.current = [];
+      mediaRecorderRef.current.ondataavailable = (event) => {
+        audioChunksRef.current.push(event.data);
+      };
+      mediaRecorderRef.current.start();
+    }
   };
 
+  useEffect(() => {
+    return () => {
+      if (mediaRecorderRef.current) {
+        mediaRecorderRef.current.stop();
+      }
+      if (mediaStreamRef.current) {
+        mediaStreamRef.current.getTracks().forEach((track) => track.stop());
+      }
+    };
+  }, []);
+
   const stopRecording = () => {
+    setRecording("finished");
+
     if (mediaRecorderRef.current) {
       mediaRecorderRef.current.stop();
       mediaRecorderRef.current.onstop = () => {
@@ -81,122 +96,65 @@ export const Content = () => {
     }
   };
 
-  const replay = () => {
-    if (audioRef.current) {
-      console.log("replay");
-      audioRef.current.currentTime = 0;
-      audioRef.current.play();
-    }
-  };
+  const [isReplay, setIsReplay] = useState(false);
 
   useEffect(() => {
-    audioRef.current?.addEventListener("timeupdate", () => {
-      setProgress(
-        (audioRef.current.currentTime / audioRef.current.duration) * 100,
-      );
-    });
+    if (isReplay) {
+      if (audioRef.current && audioUrl) {
+        //reset
+        setProgress(0);
+        setRecordingTime("00:00");
 
-    mediaRecorderRef.current?.addEventListener("timeupdate", () => {
-      setProgress(
-        (audioRef.current.currentTime / audioRef.current.duration) * 100,
-      );
-    });
-  }, []);
-
-  //initialize audio
-  useEffect(() => {
-    return () => {
-      if (mediaRecorderRef.current) {
-        mediaRecorderRef.current.stop();
-      }
-      if (mediaStreamRef.current) {
-        mediaStreamRef.current.getTracks().forEach((track) => track.stop());
-      }
-    };
-  }, []);
-
-  //useEffect press button state
-  useEffect(() => {
-    setProgress(0);
-    setRecordingTime("00:00");
-    if (recording === "ready") {
-      if (audioRef.current) {
-        audioRef.current.pause();
-      }
-    } else if (recording === "recording") {
-      startRecording();
-    } else if (recording === "finished") {
-      stopRecording();
-    } else if (recording === "replay") {
-      replay();
-    }
-
-    return () => {
-      if (mediaRecorderRef.current) {
-        mediaRecorderRef.current.stop();
-      }
-      if (mediaStreamRef.current) {
-        mediaStreamRef.current.getTracks().forEach((track) => track.stop());
-      }
-    };
-  }, [recording]);
-
-  //useEffect progress button
-
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.addEventListener("timeupdate", () => {
-        const currentTime = audioRef.current.currentTime;
-        const minutes = Math.floor(currentTime / 60);
-        const seconds = Math.floor(currentTime % 60);
-        setRecordingTime(
-          `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`,
-        );
-      });
-    }
-  }, [recording]);
-
-  /////////////
-
-  const handleSubmit = () => {
-    setLoading(true);
-
-    uploadAudioToS3(audioBlobState).then((response) => {
-      const uploadedAudioUrl = response.data.Location;
-      console.log("uploadedAudioUrl", uploadedAudioUrl);
-      axios
-        .post("/api/transcripts", {
-          audio_url: uploadedAudioUrl,
-        })
-        .then((response) => {
-          const { text, audio_url } = response.data;
-          createDiary({
-            released_date: new Date(),
-            content: text,
-            audio_url: audio_url,
-          })
-            .then((res) => {
-              const { id } = res.data;
-              router.push(`/new/${id}`);
-            })
-            .finally(() => {
-              setLoading(false);
-            });
+        audioRef.current.currentTime = 0; // Reset playback to the start
+        audioRef.current.play().catch((error) => {
+          console.error("Error playing audio:", error);
         });
-    });
 
-    console.log(transcript);
-    console.log(audioUrl);
+        audioRef.current?.addEventListener("timeupdate", () => {
+          setProgress(
+            (audioRef.current.currentTime / audioRef.current.duration) * 100,
+          );
+
+          setRecordingTime(formatTime(audioRef.current.currentTime));
+        });
+
+        audioRef.current.onended = () => {
+          setIsReplay(false);
+        };
+      }
+    }
+  }, [isReplay]);
+
+  //노종원의 원래 코드
+  const handleSubmit = async () => {
+    try {
+      const formData = new FormData();
+      formData.append("audio", audioBlobState, "recorded-audio.wav");
+      await axios.post("/api/upload-to-s3", formData);
+      setLoading(false);
+      window.location.href = "/new";
+    } catch (error) {
+      alert("오디오 업로드에 실패했습니다. 새로고침 후 다시 시도해주세요.");
+      setLoading(false);
+    }
   };
 
-  //로딩을 추가한 김은식의 코드
-  const [isLoading, setLoading] = useState(false);
-  const uploadAudioToS3 = (audioBlob) => {
-    const formData = new FormData();
-    formData.append("audio", audioBlob, "recorded-audio.wav");
-
-    return axios.post("/api/upload-to-s3", formData);
-  };
+  useEffect(() => {
+    if (recording === "recording") {
+      let time = 0;
+      const interval = setInterval(() => {
+        time += 1;
+        const minutes = Math.floor(time / 60);
+        const seconds = time % 60;
+        setRecordingTime(
+          `${minutes < 10 ? `0${minutes}` : minutes}:${
+            seconds < 10 ? `0${seconds}` : seconds
+          }`,
+        );
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [recording]);
 
   return (
     <div className="flex flex-col justify-between min-h-screen">
@@ -229,17 +187,8 @@ export const Content = () => {
         {recording === "ready" && (
           <button
             type="button"
-            // className="circle-btn-shadow"
-            onClick={() => {
-              if (permissionState === "prompt") {
-                requestMicrophone();
-                return;
-              }
-
-              if (permissionState === "granted") {
-                setRecording("recording");
-              }
-            }}
+            className="circle-btn-shadow rounded-full"
+            onClick={startRecording}
           >
             <Image src="/circle.svg" alt="준비" width={81} height={81} />
           </button>
@@ -248,33 +197,24 @@ export const Content = () => {
           <button
             type="button"
             className="w-[81px] h-[81px] circle-btn-shadow rounded-full bg-white flex items-center justify-center"
-            onClick={() => setRecording("finished")}
+            onClick={() => stopRecording()}
           >
             <Image src="/square.svg" alt="일시정지" width={25} height={25} />
           </button>
         )}
-        {(recording === "finished" || recording === "replay") && (
+        {recording === "finished" && (
           <div className="flex gap-[28px]">
             <button
               type="button"
               className="w-[81px] h-[81px] circle-btn-shadow rounded-full bg-white flex items-center justify-center"
-              onClick={() => {
-                if (permissionState === "prompt") {
-                  requestMicrophone();
-                  return;
-                }
-
-                if (permissionState === "granted") {
-                  setRecording("recording");
-                }
-              }}
+              onClick={startRecording}
             >
               <Image src="/refresh.svg" alt="다시녹음" width={23} height={23} />
             </button>
             <button
               type="button"
               className="w-[81px] h-[81px] circle-btn-shadow rounded-full bg-white flex items-center justify-center pl-2"
-              onClick={() => setRecording("replay")}
+              onClick={() => setIsReplay(true)}
             >
               <Image src="/play.svg" alt="다시듣기" width={25} height={28} />
             </button>
