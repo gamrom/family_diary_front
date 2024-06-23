@@ -1,4 +1,3 @@
-// app/api/pdf/route.js
 import { NextResponse } from "next/server";
 import puppeteer from "puppeteer";
 import AWS from "aws-sdk";
@@ -20,8 +19,18 @@ export async function GET(request) {
     });
   }
 
+  let browser;
+
   try {
-    const browser = await puppeteer.launch();
+    if (process.env.NODE_ENV === "development") {
+      browser = await puppeteer.launch();
+    } else {
+      browser = await puppeteer.launch({
+        args: ["--no-sandbox", "--disable-setuid-sandbox"],
+        executablePath:
+          process.env.CHROME_EXECUTABLE_PATH || "/usr/bin/google-chrome",
+      });
+    }
     const page = await browser.newPage();
 
     await page.goto(url, { waitUntil: "networkidle0" });
@@ -52,6 +61,9 @@ export async function GET(request) {
     });
   } catch (error) {
     console.error(error);
+    if (browser) {
+      await browser.close();
+    }
     return new Response(JSON.stringify({ error: "Failed to generate PDF" }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
