@@ -7,6 +7,8 @@ import Image from "next/image";
 import styles from "./RecordingPage.module.scss";
 import axios from "axios";
 import { ProgressComp } from "./ProgressComp";
+import { useRouter } from "next/navigation";
+import { createDiary } from "@/app/_hooks/api";
 
 import { useState, useEffect, useRef } from "react";
 import { useMicrophonePermission } from "@/app/_hooks/useMicrophoneAccess";
@@ -15,7 +17,8 @@ import { recommendSentences } from "@/app/constants";
 import { RecordingComp } from "./RecordingComp";
 import { formatTime } from "@/app/utils";
 
-export const Content = () => {
+export const Content = ({ date }) => {
+  const router = useRouter();
   const audioRef = useRef(null);
   const [transcript, setTranscript] = useState("");
   const [recording, setRecording] = useState("ready");
@@ -125,18 +128,43 @@ export const Content = () => {
     }
   }, [isReplay]);
 
-  //노종원의 원래 코드
-  const handleSubmit = async () => {
+  const uploadAudioToS3 = async (audioBlob) => {
     try {
       const formData = new FormData();
-      formData.append("audio", audioBlobState, "recorded-audio.wav");
+      formData.append("audio", audioBlob, "recorded-audio.wav");
+
       await axios.post("/api/upload-to-s3", formData);
-      setLoading(false);
-      // window.location.href = "/new";
+      console.log("Audio uploaded to S3 successfully");
+      return axios.post("/api/upload-to-s3", formData);
     } catch (error) {
-      alert("오디오 업로드에 실패했습니다. 새로고침 후 다시 시도해주세요.");
-      setLoading(false);
+      console.error("Error uploading audio to S3:", error);
     }
+  };
+
+  const handleSubmit = () => {
+    uploadAudioToS3(audioBlobState).then((response) => {
+      const uploadedAudioUrl = response.data.Location;
+      console.log("uploadedAudioUrl", uploadedAudioUrl);
+      axios
+        .post("/api/transcripts", {
+          audio_url: uploadedAudioUrl,
+        })
+        .then((responseTranscript) => {
+          const { text, audio_url } = responseTranscript.data;
+          createDiary({
+            released_date: date ? date : new Date(),
+            content: text,
+            audio_url: audio_url,
+          })
+            .then((res) => {
+              const { id } = res.data;
+              router.push(`/new/${id}`);
+            })
+            .finally(() => {
+              setLoading(false);
+            });
+        });
+    });
   };
 
   useEffect(() => {

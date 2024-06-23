@@ -1,7 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 
-export const ProfileBtn = ({ profile_url }: { profile_url: string }) => {
+export const ProfileBtn = ({ profile_url }: { profile_url?: string }) => {
+  console.log(profile_url);
   return profile_url ? (
     <Link href="/mypage" className="w-[33px] h-[33px] profile">
       <Image

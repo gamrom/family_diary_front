@@ -86,7 +86,7 @@ export const Content = ({
       return;
     }
 
-    if (sendParams.image.length > 300) {
+    if (sendParams.content.length > 300) {
       alert("글자 수가 너무 많습니다. 300자 이내로 작성해주세요.");
       return;
     }
@@ -132,6 +132,8 @@ export const Content = ({
 
       // alert("오늘의 일기가 성공적으로 등록되었습니다.");
       // router.push("/");
+
+      setLoading(false);
     });
   };
 

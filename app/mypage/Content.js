@@ -6,9 +6,7 @@ import { BackBtn } from "../_components/BackBtn";
 import { useState } from "react";
 import { Logout } from "../_components/Logout";
 
-export const Content = () => {
-  const [user, setUser] = useState({});
-
+export const Content = ({ user }) => {
   return (
     <div className="flex flex-col items-center">
       <ClosePageNav>
@@ -19,11 +17,11 @@ export const Content = () => {
         </BackBtn>
       </ClosePageNav>
       <Image
-        src={user.image ? user.image : "/profile_default.png"}
+        src={user.profile_url ? user.profile_url : "/profile_default.png"}
         width={194}
         height={194}
         alt="default"
-        className="mt-[170px]"
+        className="mt-[170px] rounded-full object-cover"
       />
 
       <div className="text-[30px] font-[600] text-center mt-[50px]">

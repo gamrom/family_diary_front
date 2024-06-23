@@ -25,6 +25,13 @@ const KakaoLoginContent = () => {
       console.log(error);
       alert("카카오 로그인에 실패했습니다.");
     });
+
+  return (
+    <div>
+      로그인 중입니다. <br />
+      잠시만 기다려주세요
+    </div>
+  );
 };
 
 export const Content = () => {

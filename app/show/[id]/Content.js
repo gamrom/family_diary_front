@@ -18,6 +18,7 @@ import {
   useDisclosure,
 } from "@nextui-org/modal";
 import { PdfTemplate } from "./PdfTemplate";
+import Link from "next/link";
 
 import { PDFDownloadLink, usePDF } from "@react-pdf/renderer";
 
@@ -49,19 +50,19 @@ export const Content = ({ diary }) => {
   };
 
   //calculate progress when audio is playing after click MediaPlayButton
-  useEffect(() => {
-    if (audioRef.current) {
-      const audio = audioRef.current;
-      const onTimeUpdate = () => {
-        const progress = (audio.currentTime / audio.duration) * 100;
-        setProgress(progress);
-      };
-      audio.addEventListener("timeupdate", onTimeUpdate);
-      return () => {
-        audio.removeEventListener("timeupdate", onTimeUpdate);
-      };
-    }
-  }, [audioRef.current]);
+  // useEffect(() => {
+  //   if (audioRef.current) {
+  //     const audio = audioRef.current;
+  //     const onTimeUpdate = () => {
+  //       const progress = (audio.currentTime / audio.duration) * 100;
+  //       setProgress(progress);
+  //     };
+  //     audio.addEventListener("timeupdate", onTimeUpdate);
+  //     return () => {
+  //       audio.removeEventListener("timeupdate", onTimeUpdate);
+  //     };
+  //   }
+  // }, [audioRef.current]);
 
   const [audioLoading, setAudioLoading] = useState(true);
   useEffect(() => {
@@ -75,7 +76,7 @@ export const Content = ({ diary }) => {
           src={diary?.image_url || "/image_sample.jpeg"}
           width={354}
           height={354}
-          className="object-fit w-full rounded-[30px]"
+          className="object-cover w-full rounded-[30px] aspect-square"
           alt="상세이미지"
         />
 
@@ -91,9 +92,12 @@ export const Content = ({ diary }) => {
           </div>
         </div>
 
-        <BackBtn style="absolute flex flex-col text-white top-[15px] right-[20px] font-[600]">
+        <Link
+          href="/"
+          className="absolute flex flex-col text-white top-[15px] right-[20px] font-[600]"
+        >
           <Image src="/x_white.svg" width={13} height={13} alt="닫기" />
-        </BackBtn>
+        </Link>
       </div>
 
       <a
@@ -124,7 +128,13 @@ export const Content = ({ diary }) => {
             audio
             className="bg-transparent mt-[31px] w-full flex-col items-center justify-center"
           >
-            <audio ref={audioRef} slot="media" src={diary?.audio_url}></audio>
+            <audio
+              ref={audioRef}
+              slot="media"
+              src={
+                "https://family-diary-real-bucket.s3.ap-northeast-2.amazonaws.com/recorded-audio-1719140363349.wav"
+              }
+            ></audio>
             <div className="flex items-center justify-center gap-4">
               <ProgressComp percent={progress} />
               <MediaTimeDisplay className="bg-transparent"></MediaTimeDisplay>
@@ -143,9 +153,9 @@ export const Content = ({ diary }) => {
                 }}
               >
                 <Image
-                  src="/arrow_down.svg"
-                  width={26}
-                  height={25}
+                  src="/trash.svg"
+                  width={27}
+                  height={27}
                   alt="삭제"
                 ></Image>
               </button>
@@ -157,6 +167,7 @@ export const Content = ({ diary }) => {
                   alt="재생"
                 ></Image>
               </MediaPlayButton>
+
               <button
                 type="button"
                 onClick={onOpen}

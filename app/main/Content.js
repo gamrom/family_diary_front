@@ -59,11 +59,13 @@ export const Content = ({ diaries, initialDiary, user }) => {
     );
   }, [currentDiary]);
 
+  console.log(user);
+
   return (
     <>
       <ClosePageNav>
         <div className="invisible">
-          <ProfileBtn profile_url={user?.profile_url} />
+          <ProfileBtn />
         </div>
         <button
           onClick={onOpen}
@@ -81,7 +83,7 @@ export const Content = ({ diaries, initialDiary, user }) => {
             className="ml-[10px]"
           />
         </button>
-        <ProfileBtn />
+        <ProfileBtn profile_url={user.profile_url} />
       </ClosePageNav>
       <div className="mt-[28px]"></div>
       <Calendar
