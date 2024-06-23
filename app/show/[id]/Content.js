@@ -7,7 +7,13 @@ import { useState, useRef, useEffect } from "react";
 import { ProgressComp } from "./ProgressComp";
 import "react-calendar/dist/Calendar.css";
 import "./style.css";
-import { deleteDiary, getCurrentUser } from "@/app/_hooks/api";
+import {
+  deleteDiary,
+  getCurrentUser,
+  postPrinterEmail,
+  sendPrint,
+} from "@/app/_hooks/api";
+import { Input } from "@nextui-org/input";
 
 import {
   Modal,
@@ -27,10 +33,11 @@ export const Content = ({ diary }) => {
     onClose: onCloseFunction,
   } = useDisclosure();
   const [progress, setProgress] = useState(0);
-  const pdfBtnRef = useRef();
+
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioTime, setAudioTime] = useState(0);
   const [stage, setStage] = useState("initial"); // "initial", "printer_email_empty", "printer_email_exist", "send_print"
+  const [printerEmail, setPrinterEmail] = useState("");
 
   // when play, calculate progress -> current time / total duration * 100
   const audioRef = useRef();
@@ -39,9 +46,11 @@ export const Content = ({ diary }) => {
     getCurrentUser()
       .then((res) => {
         const { id, name, email, profile_url, printer_email } = res.data;
+
         if (printer_email === null) {
           setStage("printer_email_empty");
         } else {
+          setPrinterEmail(printer_email);
           setStage("printer_email_exist");
         }
         // setIsLoading(true);
@@ -51,6 +60,25 @@ export const Content = ({ diary }) => {
         alert("해당 기능은 로그인이 필요합니다.");
         onCloseFunction();
         return;
+      });
+  };
+
+  const onSubmitSendPrint = () => {
+    sendPrint().then(() => {
+      setStage("send_print");
+    });
+  }
+  
+
+  const onSetPrinterEmail = () => {
+    postPrinterEmail({ printer_email: printerEmail })
+      .then((res) => {
+        onSubmitSendPrint();
+      })
+      .catch((err) => {
+        console.log(err);
+        const message = err.response.data.message;
+        alert("프린터 이메일 등록에 실패했습니다. \n" + message);
       });
   };
 
@@ -185,68 +213,6 @@ export const Content = ({ diary }) => {
             </button>
           </div>
         </div>
-
-        {/* {!audioLoading && (
-          <MediaController
-            audio
-            className="bg-transparent mt-[31px] w-full flex-col items-center justify-center"
-          >
-            <audio
-              ref={audioRef}
-              slot="media"
-              src={
-                // "https://family-diary-real-bucket.s3.ap-northeast-2.amazonaws.com/recorded-audio-1719140363349.wav"
-                "https://stream.mux.com/O4h5z00885HEucNNa1rV02wZapcGp01FXXoJd35AHmGX7g/audio.m4a"
-              }
-            ></audio>
-
-            <div className="flex items-center justify-center gap-4">
-              <ProgressComp percent={progress} />
-              <MediaTimeDisplay className="bg-transparent"></MediaTimeDisplay>
-            </div>
-            <div className="flex mt-[30px] items-center justify-between">
-              <button
-                type="button"
-                className="!bg-transparent w-[81px] h-[81px] circle-btn-shadow-show rounded-full bg-white flex items-center justify-center"
-                onClick={() => {
-                  if (confirm("정말 삭제하시겠습니까?")) {
-                    deleteDiary(diary.id).then(() => {
-                      alert("삭제되었습니다.");
-                      window.location.href = "/";
-                    });
-                  }
-                }}
-              >
-                <Image
-                  src="/trash.svg"
-                  width={27}
-                  height={27}
-                  alt="삭제"
-                ></Image>
-              </button>
-              <MediaPlayButton className="!bg-transparent  w-[81px] h-[81px] circle-btn-shadow-show rounded-full bg-white flex items-center justify-center">
-                <Image
-                  src="/play.svg"
-                  width={36}
-                  height={36}
-                  alt="재생"
-                ></Image>
-              </MediaPlayButton>
-
-              <button
-                type="button"
-                onClick={onOpen}
-                className="!bg-transparent  w-[81px] h-[81px] circle-btn-shadow-show rounded-full bg-white flex items-center justify-center"
-              >
-                <Image
-                  src="/print.svg"
-                  width={32}
-                  height={28}
-                  alt="재생"
-                ></Image>
-              </button>
-            </div>
-          </MediaController> */}
       </div>
 
       <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
@@ -264,7 +230,7 @@ export const Content = ({ diary }) => {
                   />
 
                   <div className="text-center font-[600] text-lg font-[Kodchasan] px-[34px] mt-[37px]">
-                    180일간 아이와의 추억이 가득 찼네요.
+                    우리 아이와의 추억이 가득 찼네요.
                     <br /> <br />
                     지금 바로 추억을 육아일기 책으로 만나보시겠어요?
                   </div>
@@ -288,49 +254,81 @@ export const Content = ({ diary }) => {
                 </ModalBody>
               ) : stage === "printer_email_empty" ? (
                 <ModalBody className="flex items-center p-0">
-                  {/* <Image
+                  <Image
                     src="/circle_char.svg"
                     className="mt-auto circle-btn-shadow rounded-full"
                     width={89}
                     height={89}
                     alt="메인캐릭터"
-                  /> */}
-
-                  <div className="text-center font-[600] text-lg font-[Kodchasan] px-[34px] mt-[37px]">
+                  />
+                  <div className="text-center font-[600] text-lg font-[Kodchasan] mt-4">
                     프린터 이메일 등록
                   </div>
 
-                  <div className="text-center font-[600] text-lg font-[Kodchasan] px-[34px] mt-[37px]">
+                  <div className="text-center font-[600] text-lg font-[Kodchasan] mt-2">
                     프린터 이메일을 등록하시면 육아일기를 책으로 만들어드립니다.
                   </div>
 
-                  <div className="">
-                    <input
+                  <div className="w-full">
+                    <Input
                       type="text"
+                      value={printerEmail}
+                      onChange={(e) => setPrinterEmail(e.target.value)}
                       placeholder="프린터 이메일을 입력해주세요"
-                      className="w-full h-[50px] rounded-[30px] border-[1px] border-[#E0E0E0] px-[20px] text-sm font-[500] mt-[20px]"
                     />
                   </div>
 
                   <div className="flex space-x-[19px] w-full mt-auto">
                     <button
                       type="button"
-                      onClick={onClose}
-                      className="bg-[#F5F5F5] text-[17px] font-[600] text-black w-full rounded-[30px] pt-[16px] pb-[15px] flex items-center justify-center"
-                    >
-                      취소
-                    </button>
-                    <button
-                      type="button"
-                      onClick={onSubmit}
+                      onClick={onSetPrinterEmail}
                       className="bg-[#FF4D49] text-[17px] font-[600] text-white w-full rounded-[30px] pt-[16px] pb-[15px] flex items-center justify-center"
                     >
-                      확인
+                      등록 후 인쇄
                     </button>
                   </div>
                 </ModalBody>
               ) : stage === "printer_email_exist" ? (
-                <ModalBody className="flex items-center p-0"></ModalBody>
+                <ModalBody className="flex items-center p-0">
+                  <Image
+                    src="/circle_char.svg"
+                    className="mt-auto circle-btn-shadow rounded-full"
+                    width={89}
+                    height={89}
+                    alt="메인캐릭터"
+                  />
+                  <div className="text-center font-[600] text-lg font-[Kodchasan] mt-4">
+                    기존 프린터로 인쇄
+                  </div>
+
+                  <div className="text-center font-[600] text-lg font-[Kodchasan] mt-2">
+                    기존의 프린터 이메일 주소로 육아일기를 책으로
+                    만들어드립니다.
+                  </div>
+
+                  <div className="w-full">
+                    <Input type="text" value={printerEmail} readOnly />
+                  </div>
+
+                  <div className="flex space-x-[19px] w-full mt-auto">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setStage("printer_email_empty");
+                      }}
+                      className="bg-[#F5F5F5] text-[17px] font-[600] text-black w-full rounded-[30px] pt-[16px] pb-[15px] flex items-center justify-center"
+                    >
+                      변경(새로 등록)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={onSubmitSendPrint}
+                      className="bg-[#FF4D49] text-[17px] font-[600] text-white w-full rounded-[30px] pt-[16px] pb-[15px] flex items-center justify-center"
+                    >
+                      인쇄
+                    </button>
+                  </div>
+                </ModalBody>
               ) : (
                 stage === "send_print" && (
                   <ModalBody className="flex items-center p-0">

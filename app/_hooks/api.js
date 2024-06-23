@@ -51,6 +51,14 @@ export function getCurrentUser() {
   return api.get("/current_user");
 }
 
+export function postPrinterEmail(data) {
+  return api.post("/current_user/set_printer_email", data);
+}
+
+export function sendPrint(data) {
+  return api.post("/current_user/print", data);
+}
+
 export function createDiary(data) {
   return api.post("/diaries", data, {
     headers: {
