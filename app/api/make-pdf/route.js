@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
-import puppeteer from "puppeteer";
+// import puppeteer from "puppeteer";
+import edgeChromium from "chrome-aws-lambda";
+import puppeteer from "puppeteer-core";
+
 import AWS from "aws-sdk";
 
 const s3 = new AWS.S3({
@@ -11,6 +14,8 @@ const s3 = new AWS.S3({
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const url = searchParams.get("url");
+  const executablePath =
+    (await edgeChromium.executablePath) || LOCAL_CHROME_EXECUTABLE;
 
   if (!url) {
     return new Response(JSON.stringify({ error: "URL is required" }), {
@@ -27,8 +32,7 @@ export async function GET(request) {
     } else {
       browser = await puppeteer.launch({
         args: ["--no-sandbox", "--disable-setuid-sandbox"],
-        executablePath:
-          process.env.CHROME_EXECUTABLE_PATH || "/usr/bin/google-chrome",
+        executablePath: executablePath || "/usr/bin/google-chrome",
       });
     }
     const page = await browser.newPage();
