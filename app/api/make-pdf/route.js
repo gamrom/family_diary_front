@@ -1,8 +1,5 @@
 import { NextResponse } from "next/server";
-import * as puppeteer from "puppeteer";
-
-import chromium from "@sparticuz/chromium";
-import puppeteerCore from "puppeteer-core";
+import puppeteer from "puppeteer";
 import AWS from "aws-sdk";
 
 const s3 = new AWS.S3({
@@ -28,11 +25,10 @@ export async function GET(request) {
     if (process.env.NODE_ENV === "development") {
       browser = await puppeteer.launch();
     } else {
-      browser = await puppeteerCore.launch({
-        args: chromium.args,
-        defaultViewport: chromium.defaultViewport,
-        executablePath: await chromium.executablePath(),
-        headless: chromium.headless,
+      browser = await puppeteer.launch({
+        args: ["--no-sandbox", "--disable-setuid-sandbox"],
+        // executablePath:
+        //   process.env.CHROME_EXECUTABLE_PATH || "/usr/bin/google-chrome",
       });
     }
     const page = await browser.newPage();
