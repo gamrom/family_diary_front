@@ -12,3 +12,5 @@ Vercel
 - You have to turn on backend server. If you are not, you can't see some pages.
 - rails s -p 5000 (use 5000 port)
 
+## Demo
+https://youtu.be/bIJlyweLkCs 
