@@ -35,9 +35,9 @@ export async function GET(request) {
 
     await page.goto(url, { waitUntil: "networkidle0" });
 
-    await page.waitForSelector(".pdf_wrapper", {
-      timeout: 10000, // 10초 동안 기다립니다.
-    });
+    // await page.waitForSelector(".pdf_wrapper", {
+    //   timeout: 10000, // 10초 동안 기다립니다.
+    // });
 
     const pdf = await page.pdf({
       format: "A4",
