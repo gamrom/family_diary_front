@@ -15,9 +15,9 @@ export async function POST(request) {
 
     const params = {
       Bucket: process.env.AWS_S3_BUCKET_NAME,
-      Key: `recorded-audio-${Date.now()}.wav`,
+      Key: `recorded-audio-${Date.now()}.mp3`,
       Body: Buffer.from(audioFile),
-      ContentType: "audio/wav",
+      ContentType: "audio/mpeg",
       ACL: "public-read",
     };
 
@@ -30,7 +30,7 @@ export async function POST(request) {
     console.error("Error uploading audio to S3:", error);
     return NextResponse.json(
       { error: "Error uploading audio to S3" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

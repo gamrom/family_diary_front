@@ -67,8 +67,7 @@ export const Content = ({ diary }) => {
       alert("추억이 책으로 출력되는 중입니다~!");
       onCloseFunction();
     });
-  }
-  
+  };
 
   const onSetPrinterEmail = () => {
     postPrinterEmail({ printer_email: printerEmail })
@@ -107,7 +106,6 @@ export const Content = ({ diary }) => {
     setAudioLoading(false);
   }, []);
 
-  console.log(diary);
   return (
     <div className="flex flex-col items-center">
       <div className="mt-[20px] relative">
@@ -199,8 +197,20 @@ export const Content = ({ diary }) => {
               <button
                 type="button"
                 onClick={() => {
-                  audioRef.current.play();
-                  setIsPlaying(true);
+                  // audioRef.current.load();
+                  // const handlePlay = () => {
+                  if (audioRef.current) {
+                    const audio = audioRef.current;
+                    audio
+                      .play()
+                      .then(() => {
+                        setIsPlaying(true);
+                      })
+                      .catch((error) => {
+                        console.error("Error playing audio:", error);
+                      });
+                  }
+                  // };
                 }}
                 className="bg-transparent w-[81px] h-[81px] circle-btn-shadow-show rounded-full  flex items-center justify-center"
               >
@@ -265,7 +275,7 @@ export const Content = ({ diary }) => {
                 <ModalBody className="flex items-center p-0">
                   <Image
                     src="/circle_char.svg"
-                    className="mt-auto circle-btn-shadow rounded-full"
+                    className="mt-auto rounded-full circle-btn-shadow"
                     width={89}
                     height={89}
                     alt="메인캐릭터"
@@ -301,7 +311,7 @@ export const Content = ({ diary }) => {
                 <ModalBody className="flex items-center p-0">
                   <Image
                     src="/circle_char.svg"
-                    className="mt-auto circle-btn-shadow rounded-full"
+                    className="mt-auto rounded-full circle-btn-shadow"
                     width={89}
                     height={89}
                     alt="메인캐릭터"
