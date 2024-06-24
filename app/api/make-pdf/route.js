@@ -26,7 +26,8 @@ export async function GET(request) {
       browser = await puppeteer.launch();
     } else {
       browser = await puppeteer.launch({
-        // args: ["--no-sandbox", "--disable-setuid-sandbox"],
+        timeout: 60000, // 1분 동안 대기
+        headless: true,
         // executablePath:
         //   process.env.CHROME_EXECUTABLE_PATH || "/usr/bin/google-chrome",
       });
