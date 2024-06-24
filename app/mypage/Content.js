@@ -5,6 +5,7 @@ import Image from "next/image";
 import { BackBtn } from "../_components/BackBtn";
 import { useState } from "react";
 import { Logout } from "../_components/Logout";
+import Link from "next/link";
 
 export const Content = ({ user }) => {
   return (
@@ -31,12 +32,13 @@ export const Content = ({ user }) => {
       <div className="mt-[150px]"></div>
       <div className="flex space-x-[19px] w-full">
         <Logout />
-        <button
+        <Link
+          href={"https://forms.gle/ZDNnSkNmdPPLL1hcA"}
           type="button"
           className="bg-[#FF4D49] text-[17px] font-[600] text-white w-full rounded-[30px] pt-[16px] pb-[15px] flex items-center justify-center"
         >
           Contact Us
-        </button>
+        </Link>
       </div>
     </div>
   );

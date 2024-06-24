@@ -49,6 +49,7 @@ export const Content = ({ date }) => {
     setRecording("00:00");
     if (permissionState === "prompt") {
       requestMicrophone();
+      setRecording("ready");
       return;
     }
 
