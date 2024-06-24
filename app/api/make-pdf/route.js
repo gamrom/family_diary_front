@@ -26,7 +26,7 @@ export async function GET(request) {
       browser = await puppeteer.launch();
     } else {
       browser = await puppeteer.launch({
-        args: ["--no-sandbox", "--disable-setuid-sandbox"],
+        // args: ["--no-sandbox", "--disable-setuid-sandbox"],
         // executablePath:
         //   process.env.CHROME_EXECUTABLE_PATH || "/usr/bin/google-chrome",
       });
