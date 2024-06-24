@@ -1,14 +1,14 @@
-## Using Framework
+# Using Framework
 NextJS 
 
-## Front Server
+# Front Server
 Vercel
 
-# How to run
+## How to run
 1. yarn install
 2. yanr dev  (use 3000 port)
 
-# Backend Settings
+## Backend Settings
 - You have to turn on backend server. If you are not, you can't see some pages.
 - rails s -p 5000 (use 5000 port)
 
