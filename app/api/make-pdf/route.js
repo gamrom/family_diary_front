@@ -36,6 +36,9 @@ export async function GET(request) {
         ignoreDefaultArgs: ["--disable-extensions"],
         headless: true,
         timeout: 60000,
+        env: {
+          DISPLAY: ":99.0",
+        },
         // executablePath:
         //   process.env.CHROME_EXECUTABLE_PATH || "/usr/bin/google-chrome",
       });
