@@ -9,6 +9,11 @@ const nextConfig = {
         // 필요한 경우 경로 패턴도 추가할 수 있습니다.
         // pathname: '/uploads/diary/image/*',
       },
+
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+      },
     ],
   },
 };

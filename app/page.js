@@ -26,17 +26,38 @@ async function getDiaries() {
 }
 
 export default async function Home() {
-  const user = await getCurrentUser();
+  // const user = await getCurrentUser();
 
-  if (!user) {
-    redirect("/login");
-  }
+  // if (!user) {
+  //   redirect("/login");
+  // }
 
-  const diaries = await getDiaries();
+  // const diaries = await getDiaries();
 
-  if (!diaries) {
-    return <div>일기를 불러오는 중에 오류가 발생했습니다.</div>;
-  }
+  // if (!diaries) {
+  //   return <div>일기를 불러오는 중에 오류가 발생했습니다.</div>;
+  // }
+
+  const diaries = [
+    {
+      id: 1,
+      content: "asdfasdf",
+      image_url:
+        "https://res.cloudinary.com/demo/image/upload/v1312461204/sample.jpg",
+      audio_url:
+        "https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3",
+      released_date: "2024-06-25",
+    },
+  ];
+
+  const user = [
+    {
+      id: 1,
+      name: "asdfasdf",
+      image_url:
+        "https://res.cloudinary.com/demo/image/upload/v1312461204/sample.jpg",
+    },
+  ];
 
   console.log("user", user);
 
