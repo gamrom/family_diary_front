@@ -142,46 +142,46 @@ export const Content = ({
       formData.append("image", imgRef.current.files[0]);
     }
 
-    updateDiary(diary?.id, formData).then(async (res: any) => {
-      const { id } = res.data;
-
-      router.push(`/show/${id}`);
-    });
-
     // updateDiary(diary?.id, formData).then(async (res: any) => {
     //   const { id } = res.data;
 
-    //   setLoadingText("책이 될 페이지 생성 중..");
-
-    //   const response = await fetch(
-    //     `/api/make-pdf?url=${process.env.NEXT_PUBLIC_ORIGIN}/making_pdf/${id}`
-    //   );
-
-    //   if (!response.ok) {
-    //     alert("데이터 생성에 실패했습니다. 다시 시도해주세요.");
-    //     return;
-    //   } else {
-    //     const data = await response.json();
-
-    //     const formData2 = new FormData();
-    //     formData2.append("pdf_url", data.Location);
-
-    //     setLoadingText("일기 생성 중..");
-
-    //     updateDiary(id, formData2)
-    //       .then((res: any) => {
-    //         router.push(`/show/${id}`);
-    //       })
-    //       .catch(() => {
-    //         alert("데이터 생성에 실패했습니다. 다시 시도해주세요.");
-    //       })
-    //       .finally(() => {
-    //         setLoading(false);
-    //       });
-    //   }
-
-    //   setLoading(false);
+    //   router.push(`/show/${id}`);
     // });
+
+    updateDiary(diary?.id, formData).then(async (res: any) => {
+      const { id } = res.data;
+
+      setLoadingText("책이 될 페이지 생성 중..");
+
+      const response = await fetch(
+        `http://211.197.23.41/api/make-pdf?url=${process.env.NEXT_PUBLIC_ORIGIN}/making_pdf/${id}`
+      );
+
+      if (!response.ok) {
+        alert("데이터 생성에 실패했습니다. 다시 시도해주세요.");
+        return;
+      } else {
+        const data = await response.json();
+
+        const formData2 = new FormData();
+        formData2.append("pdf_url", data.Location);
+
+        setLoadingText("일기 생성 중..");
+
+        updateDiary(id, formData2)
+          .then((res: any) => {
+            router.push(`/show/${id}`);
+          })
+          .catch(() => {
+            alert("데이터 생성에 실패했습니다. 다시 시도해주세요.");
+          })
+          .finally(() => {
+            setLoading(false);
+          });
+      }
+
+      setLoading(false);
+    });
   };
 
   return (
