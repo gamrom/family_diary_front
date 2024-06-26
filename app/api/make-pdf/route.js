@@ -26,7 +26,7 @@ export async function GET(request) {
       browser = await puppeteer.launch();
     } else {
       browser = await puppeteer.launch({
-        executablePath: "/usr/bin/chromium-browser",
+        // executablePath: "/usr/bin/chromium-browser",
         args: ["--no-sandbox", "--disable-setuid-sandbox"],
         // ignoreDefaultArgs: ["--disable-extensions"],
         headless: true,
