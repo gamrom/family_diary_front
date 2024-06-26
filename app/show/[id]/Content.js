@@ -32,6 +32,7 @@ export const Content = ({ diary }) => {
     onOpenChange,
     onClose: onCloseFunction,
   } = useDisclosure();
+  const [easter_eggs, setEasterEggs] = useState(0);
   const [progress, setProgress] = useState(0);
 
   const [isPlaying, setIsPlaying] = useState(false);
@@ -106,6 +107,13 @@ export const Content = ({ diary }) => {
     setAudioLoading(false);
   }, []);
 
+  useEffect(() => {
+    if (easter_eggs === 5) {
+      console.log(diary?.pdf_url);
+      setEasterEggs(0);
+    }
+  }, [easter_eggs, diary.pdf_url]);
+
   return (
     <div className="flex flex-col items-center">
       <div className="mt-[20px] relative">
@@ -115,6 +123,9 @@ export const Content = ({ diary }) => {
           height={354}
           className="object-cover rounded-[30px] aspect-square"
           alt="상세이미지"
+          onClick={() => {
+            setEasterEggs(easter_eggs + 1);
+          }}
         />
 
         <div className="absolute flex flex-col text-white top-[15px] left-[20px] font-[600]">
