@@ -154,7 +154,7 @@ export const Content = ({
       setLoadingText("책이 될 페이지 생성 중..");
 
       const response = await fetch(
-        `http://211.197.23.41/api/make-pdf?url=${process.env.NEXT_PUBLIC_ORIGIN}/making_pdf/${id}`
+        `/api/send-make-pdf?url=${process.env.NEXT_PUBLIC_ORIGIN}/making_pdf/${id}`
       );
 
       if (!response.ok) {
