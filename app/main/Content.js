@@ -277,8 +277,8 @@ export const Content = ({ diaries, user }) => {
                   오늘의 일기를 <br /> 작성해 보시겠어요?
                 </div>
                 <div className="font-[400] font-[Kodchasan] text-xs text-center mt-[12px]">
-                  *IOS 환경에서는 작동하지 않을 수 있습니다. 크롬 사용을
-                  권장드립니다.
+                  *애플 아이폰과 사파리에서는 작동하지 오디오 기능이 작동하지
+                  않을 수 있습니다. 맥 이용자는 크롬을 사용해주세요.
                 </div>
                 <div className="flex space-x-[19px] w-full mt-[116px]">
                   <button
