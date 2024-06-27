@@ -146,7 +146,6 @@ export const Content = ({ date }) => {
     setLoading(true);
     uploadAudioToS3(audioBlobState).then((response) => {
       const uploadedAudioUrl = response.data.Location;
-      console.log("uploadedAudioUrl", uploadedAudioUrl);
       axios
         .post("/api/send-transcripts", {
           audio_url: uploadedAudioUrl,
@@ -159,12 +158,13 @@ export const Content = ({ date }) => {
             audio_url: audio_url,
           })
             .then((res) => {
+              setLoading(false);
               const { id } = res.data;
               router.push(`/new/${id}`);
-            })
-            .finally(() => {
+            }).catch((error) => {
+              console.error("Error creating diary:", error);
               setLoading(false);
-            });
+            })
         });
     });
   };
