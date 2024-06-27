@@ -157,7 +157,7 @@ export const Content = ({ diary }) => {
         </div>
 
         <div
-          className="max-w-[400px] blur-[10px] fixed w-full h-full top-0 translate-x-[-50%] left-[50%] z-[-1] before:absolute before:top-0 before:left-0 before:w-full before:h-full before:bg-black/30 before:z-[1]"
+          className="bg-image-move max-w-[400px] blur-[15px] fixed w-full h-full top-0 translate-x-[-50%] left-[50%] z-[-1] before:absolute before:top-0 before:left-0 before:w-full before:h-full before:bg-black/30 before:z-[1]"
           style={{
             background: `url(${diary?.image_url})`,
           }}
