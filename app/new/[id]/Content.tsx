@@ -351,7 +351,12 @@ export const Content = ({
           )}
         </div>
 
-        <input ref={imgRef} type="file" accept="image/*" hidden />
+        <input
+          ref={imgRef}
+          type="file"
+          accept={"image/png, image/jpeg"}
+          className="hidden"
+        />
       </div>
 
       <audio ref={audioRef} className="hidden" src={diary.audio_url} />

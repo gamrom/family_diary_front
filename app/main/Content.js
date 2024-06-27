@@ -276,6 +276,10 @@ export const Content = ({ diaries, user }) => {
                 <div className="font-[600] font-[Kodchasan] text-lg text-center mt-[18px]">
                   오늘의 일기를 <br /> 작성해 보시겠어요?
                 </div>
+                <div className="font-[600] font-[Kodchasan] text-xs text-center mt-[12px]">
+                  *IOS 환경에서는 작동하지 않을 수 있습니다. 크롬 사용을
+                  권장드립니다.
+                </div>
                 <div className="flex space-x-[19px] w-full mt-[116px]">
                   <button
                     type="button"
