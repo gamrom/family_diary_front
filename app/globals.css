@@ -151,3 +151,17 @@
 .bottom_main-content {
   box-shadow: 0px 4px 20px 1px rgba(0, 0, 0, 0.1);
 }
+
+@keyframes animatedBackground {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 100% 0;
+  }
+}
+.bg-image-move {
+  background-position: 0px 0px;
+  background-repeat: repeat-x;
+  animation: animatedBackground 10s linear infinite alternate;
+}

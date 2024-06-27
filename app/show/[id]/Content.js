@@ -115,54 +115,183 @@ export const Content = ({ diary }) => {
   }, [easter_eggs, diary.pdf_url]);
 
   return (
-    <div className="flex flex-col items-center">
-      <div className="mt-[20px] relative">
-        <Image
-          src={diary?.image_url || "/image_sample.jpeg"}
-          width={354}
-          height={354}
-          className="object-cover rounded-[30px] aspect-square"
-          alt="상세이미지"
-          onClick={() => {
-            setEasterEggs(easter_eggs + 1);
-          }}
-        />
+    <>
+      <div className="flex flex-col items-center">
+        <div className="mt-[20px] relative">
+          <Image
+            src={diary?.image_url || "/image_sample.jpeg"}
+            width={354}
+            height={354}
+            className="object-cover rounded-[30px] aspect-square"
+            alt="상세이미지"
+            onClick={() => {
+              setEasterEggs(easter_eggs + 1);
+            }}
+          />
 
-        <div className="absolute flex flex-col text-white top-[15px] left-[20px] font-[600]">
-          <div className="text-[11px]">
-            {dayjs(diary?.released_date?.replace(/-/g, "/")).format("YYYY년")}
+          <div className="absolute flex flex-col text-white top-[15px] left-[20px] font-[600]">
+            <div className="text-[11px]">
+              {dayjs(diary?.released_date?.replace(/-/g, "/")).format("YYYY년")}
+            </div>
+            <div className="text-[25px]">
+              {dayjs(diary?.released_date?.replace(/-/g, "/")).format("M월")}
+            </div>
+            <div className="text-[25px]">
+              {dayjs(diary?.released_date?.replace(/-/g, "/")).format("DD일")}
+            </div>
           </div>
-          <div className="text-[25px]">
-            {dayjs(diary?.released_date?.replace(/-/g, "/")).format("M월")}
-          </div>
-          <div className="text-[25px]">
-            {dayjs(diary?.released_date?.replace(/-/g, "/")).format("DD일")}
-          </div>
+
+          <Link
+            href="/"
+            className="absolute flex flex-col text-white top-[15px] right-[20px] font-[600]"
+          >
+            <Image src="/x_white.svg" width={13} height={13} alt="닫기" />
+          </Link>
         </div>
 
-        <Link
-          href="/"
-          className="absolute flex flex-col text-white top-[15px] right-[20px] font-[600]"
-        >
-          <Image src="/x_white.svg" width={13} height={13} alt="닫기" />
-        </Link>
-      </div>
+        <div className="text-white px-4 text-center h-[140px] overflow-auto show-text mt-[44px] relative">
+          <div
+            className="whitespace-pre-wrap"
+            dangerouslySetInnerHTML={{ __html: diary.content }}
+          ></div>
+        </div>
 
-      <div className="text-white px-4 text-center h-[140px] overflow-auto show-text mt-[44px] relative">
         <div
-          className="whitespace-pre-wrap"
-          dangerouslySetInnerHTML={{ __html: diary.content }}
+          className="bg-image-move max-w-[400px] blur-[15px] fixed w-full h-full top-0 translate-x-[-50%] left-[50%] z-[-1] before:absolute before:top-0 before:left-0 before:w-full before:h-full before:bg-black/30 before:z-[1]"
+          style={{
+            background: `url(${diary?.image_url})`,
+          }}
         ></div>
+
+        <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+          <ModalContent className="max-w-[328px] h-[60vh] p-[30px]">
+            {(onClose) => (
+              <>
+                {stage === "initial" ? (
+                  <ModalBody className="flex items-center p-0">
+                    <Image
+                      src="/circle_char.svg"
+                      className="mt-auto rounded-full circle-btn-shadow"
+                      width={89}
+                      height={89}
+                      alt="메인캐릭터"
+                    />
+
+                    <div className="text-center font-[600] text-lg font-[Kodchasan] px-[34px] mt-[37px]">
+                      우리 아이와의 추억이 가득 찼네요.
+                      <br /> <br />
+                      지금 바로 추억을 육아일기 책으로 만나보시겠어요?
+                    </div>
+
+                    <div className="flex space-x-[19px] w-full mt-auto">
+                      <button
+                        type="button"
+                        onClick={onClose}
+                        className="bg-[#F5F5F5] text-[17px] font-[600] text-black w-full rounded-[30px] pt-[16px] pb-[15px] flex items-center justify-center"
+                      >
+                        취소
+                      </button>
+                      <button
+                        type="button"
+                        onClick={onSubmit}
+                        className="bg-[#FF4D49] text-[17px] font-[600] text-white w-full rounded-[30px] pt-[16px] pb-[15px] flex items-center justify-center"
+                      >
+                        확인
+                      </button>
+                    </div>
+                  </ModalBody>
+                ) : stage === "printer_email_empty" ? (
+                  <ModalBody className="flex items-center p-0">
+                    <Image
+                      src="/circle_char.svg"
+                      className="mt-auto rounded-full circle-btn-shadow"
+                      width={89}
+                      height={89}
+                      alt="메인캐릭터"
+                    />
+                    <div className="text-center font-[600] text-lg font-[Kodchasan] mt-4">
+                      프린터 이메일 등록
+                    </div>
+
+                    <div className="text-center font-[600] text-lg font-[Kodchasan] mt-2">
+                      프린터 이메일을 등록하시면 육아일기를 책으로
+                      만들어드립니다.
+                    </div>
+
+                    <div className="w-full">
+                      <Input
+                        type="text"
+                        value={printerEmail}
+                        onChange={(e) => setPrinterEmail(e.target.value)}
+                        placeholder="프린터 이메일을 입력해주세요"
+                      />
+                    </div>
+
+                    <div className="flex space-x-[19px] w-full mt-auto">
+                      <button
+                        type="button"
+                        onClick={onSetPrinterEmail}
+                        className="bg-[#FF4D49] text-[17px] font-[600] text-white w-full rounded-[30px] pt-[16px] pb-[15px] flex items-center justify-center"
+                      >
+                        등록 후 인쇄
+                      </button>
+                    </div>
+                  </ModalBody>
+                ) : stage === "printer_email_exist" ? (
+                  <ModalBody className="flex items-center p-0">
+                    <Image
+                      src="/circle_char.svg"
+                      className="mt-auto rounded-full circle-btn-shadow"
+                      width={89}
+                      height={89}
+                      alt="메인캐릭터"
+                    />
+                    <div className="text-center font-[600] text-lg font-[Kodchasan] mt-4">
+                      기존 프린터로 인쇄
+                    </div>
+
+                    <div className="text-center font-[600] text-lg font-[Kodchasan] mt-2">
+                      기존의 프린터 이메일 주소로 육아일기를 책으로
+                      만들어드립니다.
+                    </div>
+
+                    <div className="w-full">
+                      <Input type="text" value={printerEmail} readOnly />
+                    </div>
+
+                    <div className="flex space-x-[19px] w-full mt-auto">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setStage("printer_email_empty");
+                        }}
+                        className="bg-[#F5F5F5] text-[17px] font-[600] text-black w-full rounded-[30px] pt-[16px] pb-[15px] flex items-center justify-center"
+                      >
+                        변경(새로 등록)
+                      </button>
+                      <button
+                        type="button"
+                        onClick={onSubmitSendPrint}
+                        className="bg-[#FF4D49] text-[17px] font-[600] text-white w-full rounded-[30px] pt-[16px] pb-[15px] flex items-center justify-center"
+                      >
+                        인쇄
+                      </button>
+                    </div>
+                  </ModalBody>
+                ) : (
+                  stage === "send_print" && (
+                    <ModalBody className="flex items-center p-0">
+                      <LoadingTransform onClose={onClose} />
+                    </ModalBody>
+                  )
+                )}
+              </>
+            )}
+          </ModalContent>
+        </Modal>
       </div>
 
-      <div
-        className="max-w-[400px] blur-[20px] fixed w-full h-full top-0 translate-x-[-50%] left-[50%] z-[-1] before:absolute before:top-0 before:left-0 before:w-full before:h-full before:bg-black/30 before:z-[1]"
-        style={{
-          background: `url(${diary?.image_url})`,
-        }}
-      ></div>
-
-      <div className="fixed bottom-0 pb-[57px]">
+      <div className="sticky bottom-0 pb-[57px]">
         <div className="bg-transparent mt-[31px] flex-col items-center justify-center w-full">
           <audio className="hidden" ref={audioRef} src={diary.audio_url} />
 
@@ -244,132 +373,6 @@ export const Content = ({ diary }) => {
           </div>
         </div>
       </div>
-
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
-        <ModalContent className="max-w-[328px] h-[60vh] p-[30px]">
-          {(onClose) => (
-            <>
-              {stage === "initial" ? (
-                <ModalBody className="flex items-center p-0">
-                  <Image
-                    src="/circle_char.svg"
-                    className="mt-auto rounded-full circle-btn-shadow"
-                    width={89}
-                    height={89}
-                    alt="메인캐릭터"
-                  />
-
-                  <div className="text-center font-[600] text-lg font-[Kodchasan] px-[34px] mt-[37px]">
-                    우리 아이와의 추억이 가득 찼네요.
-                    <br /> <br />
-                    지금 바로 추억을 육아일기 책으로 만나보시겠어요?
-                  </div>
-
-                  <div className="flex space-x-[19px] w-full mt-auto">
-                    <button
-                      type="button"
-                      onClick={onClose}
-                      className="bg-[#F5F5F5] text-[17px] font-[600] text-black w-full rounded-[30px] pt-[16px] pb-[15px] flex items-center justify-center"
-                    >
-                      취소
-                    </button>
-                    <button
-                      type="button"
-                      onClick={onSubmit}
-                      className="bg-[#FF4D49] text-[17px] font-[600] text-white w-full rounded-[30px] pt-[16px] pb-[15px] flex items-center justify-center"
-                    >
-                      확인
-                    </button>
-                  </div>
-                </ModalBody>
-              ) : stage === "printer_email_empty" ? (
-                <ModalBody className="flex items-center p-0">
-                  <Image
-                    src="/circle_char.svg"
-                    className="mt-auto rounded-full circle-btn-shadow"
-                    width={89}
-                    height={89}
-                    alt="메인캐릭터"
-                  />
-                  <div className="text-center font-[600] text-lg font-[Kodchasan] mt-4">
-                    프린터 이메일 등록
-                  </div>
-
-                  <div className="text-center font-[600] text-lg font-[Kodchasan] mt-2">
-                    프린터 이메일을 등록하시면 육아일기를 책으로 만들어드립니다.
-                  </div>
-
-                  <div className="w-full">
-                    <Input
-                      type="text"
-                      value={printerEmail}
-                      onChange={(e) => setPrinterEmail(e.target.value)}
-                      placeholder="프린터 이메일을 입력해주세요"
-                    />
-                  </div>
-
-                  <div className="flex space-x-[19px] w-full mt-auto">
-                    <button
-                      type="button"
-                      onClick={onSetPrinterEmail}
-                      className="bg-[#FF4D49] text-[17px] font-[600] text-white w-full rounded-[30px] pt-[16px] pb-[15px] flex items-center justify-center"
-                    >
-                      등록 후 인쇄
-                    </button>
-                  </div>
-                </ModalBody>
-              ) : stage === "printer_email_exist" ? (
-                <ModalBody className="flex items-center p-0">
-                  <Image
-                    src="/circle_char.svg"
-                    className="mt-auto rounded-full circle-btn-shadow"
-                    width={89}
-                    height={89}
-                    alt="메인캐릭터"
-                  />
-                  <div className="text-center font-[600] text-lg font-[Kodchasan] mt-4">
-                    기존 프린터로 인쇄
-                  </div>
-
-                  <div className="text-center font-[600] text-lg font-[Kodchasan] mt-2">
-                    기존의 프린터 이메일 주소로 육아일기를 책으로
-                    만들어드립니다.
-                  </div>
-
-                  <div className="w-full">
-                    <Input type="text" value={printerEmail} readOnly />
-                  </div>
-
-                  <div className="flex space-x-[19px] w-full mt-auto">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setStage("printer_email_empty");
-                      }}
-                      className="bg-[#F5F5F5] text-[17px] font-[600] text-black w-full rounded-[30px] pt-[16px] pb-[15px] flex items-center justify-center"
-                    >
-                      변경(새로 등록)
-                    </button>
-                    <button
-                      type="button"
-                      onClick={onSubmitSendPrint}
-                      className="bg-[#FF4D49] text-[17px] font-[600] text-white w-full rounded-[30px] pt-[16px] pb-[15px] flex items-center justify-center"
-                    >
-                      인쇄
-                    </button>
-                  </div>
-                </ModalBody>
-              ) : (
-                stage === "send_print" && (
-                  <ModalBody className="flex items-center p-0">
-                    <LoadingTransform onClose={onClose} />
-                  </ModalBody>
-                )
-              )}
-            </>
-          )}
-        </ModalContent>
-      </Modal>
-    </div>
+    </>
   );
 };
