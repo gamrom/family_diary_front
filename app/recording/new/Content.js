@@ -136,21 +136,19 @@ export const Content = ({ date }) => {
       const formData = new FormData();
       formData.append("audio", audioBlob, "recorded-audio.wav");
 
-      await axios.post("/api/upload-to-s3", formData);
-      console.log("Audio uploaded to S3 successfully");
-      return axios.post("/api/upload-to-s3", formData);
+      return await axios.post("/api/send-upload-to-s3", formData);
     } catch (error) {
       console.error("Error uploading audio to S3:", error);
     }
   };
 
   const handleSubmit = () => {
-    setLoading(true);
+    // setLoading(true);
     uploadAudioToS3(audioBlobState).then((response) => {
       const uploadedAudioUrl = response.data.Location;
       console.log("uploadedAudioUrl", uploadedAudioUrl);
       axios
-        .post("/api/transcripts", {
+        .post("/api/send-transcripts", {
           audio_url: uploadedAudioUrl,
         })
         .then((responseTranscript) => {
