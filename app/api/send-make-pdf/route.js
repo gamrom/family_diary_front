@@ -4,7 +4,9 @@ export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const url = searchParams.get("url");
 
-  const response = await fetch("http://211.197.23.41/api/make-pdf?url=" + url);
+  const response = await fetch(
+    process.env.PDF_GEN_URL + "/make-pdf?url=" + url
+  );
 
   if (!response.ok) {
     return NextResponse.error();
