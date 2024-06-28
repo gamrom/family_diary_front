@@ -1,3 +1,4 @@
+export const maxDuration = 30;
 import { NextResponse } from "next/server";
 
 export async function GET(request) {
@@ -5,7 +6,7 @@ export async function GET(request) {
   const url = searchParams.get("url");
 
   const response = await fetch(
-    process.env.PDF_GEN_URL + "/make-pdf?url=" + url
+    process.env.PDF_GEN_URL + "/make-pdf?url=" + url,
   );
 
   if (!response.ok) {
